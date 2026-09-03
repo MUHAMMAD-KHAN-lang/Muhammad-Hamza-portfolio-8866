@@ -17,16 +17,25 @@
   --gr-600: #423E38;
 
   /* Stone — mid neutrals */
-  --st-500: #6E6862;
+  --st-500: #5F5952;
   --st-400: #8C857C;
   --st-300: #A9A199;
 
-  /* Ivory family — warm lights */
+  /* Ivory family — warm lights (ink on graphite, brand marks) */
   --iv-050: #FBF9F5;
   --iv-100: #F5F1EA;
   --iv-200: #EDE7DD;
   --iv-300: #E2DACD;
   --iv-400: #D2C8B8;
+
+  /* Warm stone — the light SURFACE family.
+     Paper stock rather than paper white: keeps the drafting feel while
+     dropping the glare behind long-form text. */
+  --sn-050: #EFEAE1;
+  --sn-100: #E8E2D7;
+  --sn-200: #DFD8CB;
+  --sn-300: #D3CABB;
+  --sn-400: #C2B8A6;
 
   /* Signature accent — copper */
   --cu:      #C2683A;   /* base */
@@ -38,14 +47,14 @@
   --tl: #3F6B66;
 
   /* Semantic — light surface (default) */
-  --bg:        var(--iv-100);
-  --bg-raise:  var(--iv-050);
-  --bg-sink:   var(--iv-200);
+  --bg:        var(--sn-100);
+  --bg-raise:  var(--sn-050);
+  --bg-sink:   var(--sn-200);
   --tx:        var(--gr-900);
   --tx-2:      var(--gr-600);
   --tx-3:      var(--st-500);
-  --rule:      var(--iv-400);
-  --rule-soft: var(--iv-300);
+  --rule:      var(--sn-400);
+  --rule-soft: var(--sn-300);
   --accent:    var(--cu);
   --accent-tx: var(--cu-deep);
 
@@ -94,7 +103,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--iv-100);
+  background: var(--sn-100);
   color: var(--gr-900);
   font-family: var(--sans);
   font-size: 1rem;
@@ -149,7 +158,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   content: ""; position: absolute; inset: 0; z-index: 0;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
-  opacity: .035;
+  opacity: .026;
   mix-blend-mode: multiply;
 }
 .dark.grain::before { opacity: .045; mix-blend-mode: overlay; }
@@ -179,6 +188,7 @@ section { position: relative; }
 .band > .wrap { position: relative; z-index: 2; }
 
 /* Editorial split: label column + content column */
+.split > * { min-width: 0; }
 .split {
   display: grid;
   grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
@@ -208,6 +218,12 @@ section { position: relative; }
 .marker__no { color: var(--accent-tx); font-weight: 500; flex: none; }
 .marker__rule { flex: 1 1 auto; height: 1px; background: var(--rule); transform-origin: left; }
 .marker__label { flex: none; }
+@media (max-width: 480px) {
+  /* A long marker label is worth two lines; it is not worth an overflow. */
+  .marker { flex-wrap: wrap; row-gap: .4rem; }
+  .marker__rule { order: 3; flex-basis: 100%; }
+  .marker__label { flex: 1 1 auto; min-width: 0; }
+}
 
 h2.title {
   font-size: clamp(2rem, 5.2vw, 3.6rem);
@@ -277,17 +293,19 @@ h3.sub {
    -------------------------------------------------------------------------- */
 .hdr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 150;
-  transition: background var(--t-med), border-color var(--t-med), backdrop-filter var(--t-med);
-  border-bottom: 1px solid transparent;
+  /* Opaque from the first pixel of scroll: the bar is a surface of its own,
+     never a window onto the hero behind it. */
+  background: var(--gr-850);
+  border-bottom: 1px solid rgba(245, 241, 234, .12);
+  transition: background var(--t-med), border-color var(--t-med), color var(--t-med);
 }
 .hdr__in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.75rem; }
 
 /* Over the dark hero the nav is light; once past it, it inverts. */
 .hdr { color: var(--iv-100); }
 .hdr.solid {
-  background: rgba(251,249,245,.88);
-  backdrop-filter: saturate(150%) blur(12px);
-  border-bottom-color: var(--iv-300);
+  background: var(--sn-050);
+  border-bottom-color: var(--sn-400);
   color: var(--gr-900);
 }
 
@@ -343,7 +361,7 @@ h3.sub {
   .burger { display: grid; }
   .navwrap {
     position: fixed; inset: 4.75rem 0 auto 0;
-    background: var(--gr-900); color: var(--iv-100);
+    background: var(--gr-850); color: var(--iv-100);
     border-bottom: 1px solid rgba(245,241,234,.14);
     padding: .5rem var(--pad) 1.5rem;
     display: none; max-height: calc(100dvh - 4.75rem); overflow-y: auto;
@@ -352,6 +370,8 @@ h3.sub {
   .nav { flex-direction: column; align-items: stretch; gap: 0; }
   .nav a { padding: .95rem .1rem; font-size: .8rem; border-bottom: 1px solid rgba(245,241,234,.1); opacity: .9; }
   .nav a::after { display: none; }
+  .hdr.solid .navwrap { background: var(--sn-050); color: var(--gr-900); border-bottom-color: var(--sn-400); }
+  .hdr.solid .nav a { border-bottom-color: var(--sn-300); }
 }
 
 /* --------------------------------------------------------------------------
@@ -429,8 +449,20 @@ h3.sub {
   line-height: .93; letter-spacing: -.045em; color: #fff;
   margin-bottom: .28em;
 }
-.hero__name .ln { display: block; overflow: hidden; }
+.hero__name .ln {
+  display: block; overflow: hidden;
+  /* line-height .93 crops the em box, so the descender of the "g" in
+     "Engineer" fell outside the reveal mask and was clipped. Pad the mask
+     so the descender lives inside it, then pull the space back out so the
+     optical line rhythm is unchanged. */
+  padding-bottom: .18em;
+  margin-bottom: -.18em;
+}
 .hero__name .ln > span { display: block; }
+/* The travel has to clear the padded box, or the glyph tops peek out
+   before the reveal starts. */
+.hero__name .mask > span { transform: translateY(125%); }
+.hero__name .mask.in > span { transform: none; }
 
 .hero__spec {
   font-size: clamp(1.05rem, 2vw, 1.55rem);
@@ -467,6 +499,18 @@ h3.sub {
 
 /* Hero technical figure */
 .figwrap { position: relative; }
+/* A block diagram has a legible minimum scale. Below it the figure scrolls
+   in its own track rather than shrinking the annotation type into noise. */
+.figscroll {
+  min-width: 0;
+  overflow-x: auto; overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: .5rem;
+}
+.figscroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
 .fig { width: 100%; height: auto; color: #6E6862; }
 .fig .stroke { fill: none; stroke: currentColor; stroke-width: 1.1; vector-effect: non-scaling-stroke; }
 .fig .stroke-2 { fill: none; stroke: #A9A199; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
@@ -495,6 +539,11 @@ h3.sub {
   100% { opacity: 0; offset-distance: 100%; }
 }
 
+/* Minimum rendered widths: chosen so the smallest label in each figure stays
+   at ~9px on screen instead of scaling away with the drawing. */
+@media (max-width: 900px) { .fig--loop { min-width: 800px; } }
+@media (max-width: 620px) { .fig--uav  { min-width: 430px; } }
+
 /* --------------------------------------------------------------------------
    11 · Statement rule (between hero and about)
    -------------------------------------------------------------------------- */
@@ -510,7 +559,6 @@ h3.sub {
   letter-spacing: .24em; text-transform: uppercase; margin: 0;
 }
 .motto__w em { font-style: normal; color: var(--cu-lift); }
-.motto__n { font-family: var(--mono); font-size: .64rem; letter-spacing: .16em; color: #78716A; margin: 0; }
 
 /* --------------------------------------------------------------------------
    12 · Reveal system
@@ -874,7 +922,7 @@ html.no-js .rv, html.no-js .rv-l, html.no-js .fade, html.no-js .mask > span { op
 html.no-js .rv-line { transform: scaleX(1) !important; }
 html.no-js .draw { stroke-dashoffset: 0 !important; }
 html.no-js #loader { display: none !important; }
-html.no-js .hdr { position: sticky; background: rgba(251,249,245,.94); color: var(--gr-900); border-bottom-color: var(--iv-300); }
+html.no-js .hdr { position: sticky; background: var(--sn-050); color: var(--gr-900); border-bottom-color: var(--sn-400); }
 html.no-js .navwrap { display: block; }
 html.no-js .chain__row .chain__k, html.no-js .ladder__s .ladder__n { color: var(--accent-tx); }
 html.no-js .ladder__s::before { transform: scale(1); opacity: 1; }
