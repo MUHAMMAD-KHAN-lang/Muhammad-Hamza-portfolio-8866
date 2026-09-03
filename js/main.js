@@ -1,251 +1,299 @@
 /* ==========================================================================
-   main.js — navigation, configuration binding, contact rendering, reveals
-   No dependencies. Fails soft: if anything here throws, the page still reads.
+   main.js — EMH motion system, navigation, branding bindings
+   No dependencies. Everything degrades: if this file fails, the page still
+   reads, because the no-js / reduced-motion fallbacks in CSS keep content
+   visible.
    ========================================================================== */
 (function () {
   "use strict";
 
   var CFG = window.SITE_CONFIG || {};
-  var $  = function (sel, root) { return (root || document).querySelector(sel); };
-  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+  var $  = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
-  /* ---------------------------------------------------------------------
-     Small helpers shared with github.js
-     --------------------------------------------------------------------- */
-  window.PortfolioUtils = {
-    escapeHtml: function (value) {
-      return String(value == null ? "" : value)
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var HAS_IO  = "IntersectionObserver" in window;
+
+  /* ---------------------------------------------------------------- utils */
+  window.EMH = {
+    esc: function (v) {
+      return String(v == null ? "" : v)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     },
-    formatDate: function (iso) {
+    date: function (iso) {
       if (!iso) return "—";
       var d = new Date(iso);
       if (isNaN(d.getTime())) return "—";
-      try {
-        return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-      } catch (e) {
-        return d.toISOString().slice(0, 10);
-      }
+      try { return d.toLocaleDateString("en-GB", { month: "short", year: "numeric" }); }
+      catch (e) { return d.toISOString().slice(0, 7); }
     },
-    githubProfileUrl: function () {
-      return "https://github.com/" + encodeURIComponent(CFG.githubUsername || "");
-    }
+    gh: function () { return "https://github.com/" + encodeURIComponent(CFG.githubUsername || ""); },
+    reduced: REDUCED
   };
 
-  /* ---------------------------------------------------------------------
-     Current year
-     --------------------------------------------------------------------- */
-  var yearEl = $("#year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  /* ------------------------------------------------------------ 1 · loader */
+  (function loader() {
+    var el = $("#loader");
+    if (!el) { document.body.classList.remove("is-loading"); return; }
+    if (REDUCED) { el.parentNode.removeChild(el); document.body.classList.remove("is-loading"); return; }
 
-  /* ---------------------------------------------------------------------
-     Bind configured GitHub links
-     --------------------------------------------------------------------- */
-  $$('[data-config="githubProfile"]').forEach(function (el) {
-    el.setAttribute("href", window.PortfolioUtils.githubProfileUrl());
+    var start = Date.now();
+    var MIN = 900, MAX = 1500;
+
+    function finish() {
+      el.classList.add("done");
+      document.body.classList.remove("is-loading");
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 520);
+    }
+    function ready() {
+      var wait = Math.max(0, MIN - (Date.now() - start));
+      setTimeout(finish, wait);
+    }
+    if (document.readyState === "complete") ready();
+    else window.addEventListener("load", ready);
+    setTimeout(finish, MAX);   // never trap the visitor
+  })();
+
+  /* ------------------------------------------- 2 · measure SVG path length */
+  function measure(root) {
+    $$(".draw", root || document).forEach(function (p) {
+      try {
+        var len = p.getTotalLength ? p.getTotalLength() : 0;
+        if (len) p.style.setProperty("--len", Math.ceil(len + 2));
+      } catch (e) { /* non-geometry node */ }
+    });
+  }
+  measure();
+  window.addEventListener("load", function () { measure(); });
+
+  /* ----------------------------------------------------- 3 · reveal engine */
+  var REVEAL = ".rv, .rv-l, .rv-line, .mask, svg.fig";
+
+  if (!HAS_IO || REDUCED) {
+    $$(REVEAL).forEach(function (el) { el.classList.add("in"); });
+    $$("#ladder .ladder__s, #flowmap .flowmap__n, #flowmap .flowmap__v, #chain .chain__row")
+      .forEach(function (el) { el.classList.add("on"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+
+    $$(REVEAL).forEach(function (el) { io.observe(el); });
+
+    /* Sequenced groups — progression is the point, so they step, not pop. */
+    function sequence(containerSel, childSel, step) {
+      var box = $(containerSel);
+      if (!box) return;
+      var kids = $$(childSel, box);
+      var seq = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          kids.forEach(function (k, i) {
+            setTimeout(function () { k.classList.add("on"); }, i * step);
+          });
+          obs.disconnect();
+        });
+      }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+      seq.observe(box);
+    }
+    sequence("#ladder",  ".ladder__s", 130);
+    sequence("#flowmap", ".flowmap__n, .flowmap__v", 110);
+    sequence("#chain",   ".chain__row", 90);
+  }
+
+  /* Late safety net: anything still hidden above the fold gets shown. */
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      $$(REVEAL).forEach(function (el) {
+        if (el.classList.contains("in")) return;
+        var b = el.getBoundingClientRect();
+        if (b.top < window.innerHeight * 1.1) el.classList.add("in");
+      });
+    }, 500);
+  });
+
+  /* --------------------------------------------------- 4 · header + nav */
+  var hdr = $("#hdr");
+  var hero = $(".hero");
+
+  if (hdr) {
+    if (hero && HAS_IO) {
+      var hio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { hdr.classList.toggle("solid", !e.isIntersecting); });
+      }, { rootMargin: "-72px 0px 0px 0px", threshold: 0 });
+      hio.observe(hero);
+    } else {
+      var onScroll = function () { hdr.classList.toggle("solid", window.scrollY > 40); };
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+  }
+
+  var burger = $("#burger"), navwrap = $("#navwrap");
+  if (burger && navwrap) {
+    var close = function () {
+      navwrap.classList.remove("open");
+      burger.setAttribute("aria-expanded", "false");
+      burger.setAttribute("aria-label", "Open menu");
+    };
+    burger.addEventListener("click", function () {
+      var open = navwrap.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      burger.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    });
+    navwrap.addEventListener("click", function (e) { if (e.target.closest("a")) close(); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && navwrap.classList.contains("open")) { close(); burger.focus(); }
+    });
+    window.addEventListener("resize", function () { if (window.innerWidth > 960) close(); });
+  }
+
+  /* Active section in the nav */
+  var links = $$('.nav a[href^="#"]');
+  if (links.length && HAS_IO) {
+    var map = links.map(function (a) {
+      var el = document.getElementById(a.getAttribute("href").slice(1));
+      return el ? { a: a, el: el } : null;
+    }).filter(Boolean);
+
+    var nio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (l) { l.classList.remove("on"); });
+        var hit = map.filter(function (m) { return m.el === e.target; })[0];
+        if (hit) hit.a.classList.add("on");
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    map.forEach(function (m) { nio.observe(m.el); });
+  }
+
+  /* ---------------------------------------------- 5 · scroll progress line */
+  var bar = $("#progress span");
+  if (bar && !REDUCED) {
+    var ticking = false;
+    var paint = function () {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      var p = h > 0 ? Math.min(1, window.scrollY / h) : 0;
+      bar.style.transform = "scaleX(" + p + ")";
+      ticking = false;
+    };
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(paint); }
+    }, { passive: true });
+    paint();
+  }
+
+  /* -------------------------------------------------- 6 · pointer accent */
+  (function cursor() {
+    if (REDUCED) return;
+    if (!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches)) return;
+    if (window.innerWidth < 1024) return;
+
+    var ring = $("#cur"), dot = $("#curdot");
+    if (!ring || !dot) return;
+    document.documentElement.classList.add("cursor-on");
+
+    var tx = -100, ty = -100, rx = -100, ry = -100, raf = null;
+
+    function loop() {
+      rx += (tx - rx) * 0.18;
+      ry += (ty - ry) * 0.18;
+      ring.style.transform = "translate3d(" + rx + "px," + ry + "px,0)";
+      dot.style.transform  = "translate3d(" + tx + "px," + ty + "px,0)";
+      raf = requestAnimationFrame(loop);
+    }
+    document.addEventListener("mousemove", function (e) {
+      tx = e.clientX; ty = e.clientY;
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+
+    var HOT = "a, button, [role=button], input, summary";
+    document.addEventListener("mouseover", function (e) {
+      if (e.target.closest && e.target.closest(HOT)) ring.classList.add("hot");
+    });
+    document.addEventListener("mouseout", function (e) {
+      if (e.target.closest && e.target.closest(HOT)) ring.classList.remove("hot");
+    });
+    document.addEventListener("mouseleave", function () { ring.style.opacity = 0; dot.style.opacity = 0; });
+    document.addEventListener("mouseenter", function () { ring.style.opacity = ""; dot.style.opacity = ""; });
+  })();
+
+  /* -------------------------------------------------- 7 · contact channels */
+  (function contact() {
+    var box = $("#chan");
+    if (!box) return;
+    var e = window.EMH.esc, rows = [];
+
+    if (CFG.email) {
+      rows.push('<a href="mailto:' + e(CFG.email) + '">' +
+        '<span class="chan__k">Email</span>' +
+        '<span class="chan__v">' + e(CFG.email) +
+          '<small>Preferred for project enquiries and technical detail.</small></span>' +
+        '<span class="chan__a" aria-hidden="true">→</span></a>');
+    }
+    if (CFG.whatsapp) {
+      rows.push('<a href="https://wa.me/' + e(CFG.whatsapp) + '" target="_blank" rel="noopener noreferrer">' +
+        '<span class="chan__k">WhatsApp</span>' +
+        '<span class="chan__v">' + e(CFG.whatsappDisplay || CFG.whatsapp) +
+          '<small>Direct message for quick technical discussion.</small></span>' +
+        '<span class="chan__a" aria-hidden="true">→</span></a>');
+    }
+    rows.push('<a href="' + window.EMH.gh() + '" target="_blank" rel="noopener noreferrer">' +
+      '<span class="chan__k">GitHub</span>' +
+      '<span class="chan__v">@' + e(CFG.githubUsername) +
+        '<small>Source code and engineering project repositories.</small></span>' +
+      '<span class="chan__a" aria-hidden="true">→</span></a>');
+
+    if (CFG.linkedinUrl) {
+      rows.push('<a href="' + e(CFG.linkedinUrl) + '" target="_blank" rel="noopener noreferrer">' +
+        '<span class="chan__k">LinkedIn</span>' +
+        '<span class="chan__v">Professional profile<small>Professional network and background.</small></span>' +
+        '<span class="chan__a" aria-hidden="true">→</span></a>');
+    } else {
+      rows.push('<div class="ch">' +
+        '<span class="chan__k">LinkedIn</span>' +
+        '<span class="chan__v" style="color:var(--tx-3)">Not published yet' +
+          '<small>Set <code>linkedinUrl</code> in js/config.js to publish this link.</small></span>' +
+        '<span class="chan__a" aria-hidden="true"></span></div>');
+    }
+
+    box.innerHTML = rows.join("");
+  })();
+
+  /* -------------------------------------------------------------- 8 · CV */
+  (function cv() {
+    var links = $$('[id^="cvDownload"]');
+    var note  = $("#cvNote");
+    if (!links.length || !CFG.cvPath) return;
+    links.forEach(function (el) { el.setAttribute("href", CFG.cvPath); });
+    if (!window.fetch) return;
+
+    fetch(CFG.cvPath, { method: "HEAD" })
+      .then(function (r) { if (!r.ok) throw new Error("missing"); })
+      .catch(function () {
+        links.forEach(function (el) {
+          el.classList.remove("btn--fill");
+          el.classList.add("btn--line");
+          el.setAttribute("aria-disabled", "true");
+        });
+        if (note) {
+          note.textContent = "PDF not uploaded yet — add " + CFG.cvPath + " and the button starts working.";
+        }
+      });
+  })();
+
+  /* ------------------------------------------------------------ 9 · misc */
+  var y = $("#year");
+  if (y) y.textContent = new Date().getFullYear();
+
+  $$('[data-gh]').forEach(function (el) {
+    el.setAttribute("href", window.EMH.gh());
     el.setAttribute("target", "_blank");
     el.setAttribute("rel", "noopener noreferrer");
   });
-
-  /* ---------------------------------------------------------------------
-     Mobile navigation
-     --------------------------------------------------------------------- */
-  var toggle = $("#navToggle");
-  var menu   = $("#navMenu");
-
-  if (toggle && menu) {
-    var closeMenu = function () {
-      menu.classList.remove("is-open");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Open navigation menu");
-    };
-    var openMenu = function () {
-      menu.classList.add("is-open");
-      toggle.setAttribute("aria-expanded", "true");
-      toggle.setAttribute("aria-label", "Close navigation menu");
-    };
-
-    toggle.addEventListener("click", function () {
-      if (menu.classList.contains("is-open")) { closeMenu(); } else { openMenu(); }
-    });
-
-    menu.addEventListener("click", function (event) {
-      if (event.target.closest("a")) closeMenu();
-    });
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && menu.classList.contains("is-open")) {
-        closeMenu();
-        toggle.focus();
-      }
-    });
-
-    window.addEventListener("resize", function () {
-      if (window.innerWidth > 940) closeMenu();
-    });
-  }
-
-  /* ---------------------------------------------------------------------
-     Sticky header shadow
-     --------------------------------------------------------------------- */
-  var header = $("#siteHeader");
-  if (header) {
-    var updateHeader = function () {
-      header.classList.toggle("is-stuck", window.scrollY > 8);
-    };
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
-  }
-
-  /* ---------------------------------------------------------------------
-     Active section highlighting in the navigation
-     --------------------------------------------------------------------- */
-  var navLinks = $$('.nav__link[href^="#"]');
-  var sections = navLinks
-    .map(function (link) {
-      var id = link.getAttribute("href").slice(1);
-      var el = id ? document.getElementById(id) : null;
-      return el ? { link: link, el: el } : null;
-    })
-    .filter(Boolean);
-
-  if (sections.length && "IntersectionObserver" in window) {
-    var sectionObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        navLinks.forEach(function (l) { l.classList.remove("is-active"); });
-        var match = sections.filter(function (s) { return s.el === entry.target; })[0];
-        if (match) match.link.classList.add("is-active");
-      });
-    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
-
-    sections.forEach(function (s) { sectionObserver.observe(s.el); });
-  }
-
-  /* ---------------------------------------------------------------------
-     Subtle reveal on scroll — respects prefers-reduced-motion
-     --------------------------------------------------------------------- */
-  var prefersReduced = window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  var revealables = $$(".reveal");
-  if (prefersReduced || !("IntersectionObserver" in window)) {
-    revealables.forEach(function (el) { el.classList.add("is-visible"); });
-  } else {
-    var revealObserver = new IntersectionObserver(function (entries, observer) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
-
-    revealables.forEach(function (el) { revealObserver.observe(el); });
-  }
-
-  // Anything still hidden after load (e.g. observer never fired) is shown.
-  window.addEventListener("load", function () {
-    setTimeout(function () {
-      $$(".reveal:not(.is-visible)").forEach(function (el) {
-        var box = el.getBoundingClientRect();
-        if (box.top < window.innerHeight) el.classList.add("is-visible");
-      });
-    }, 400);
-  });
-
-  /* ---------------------------------------------------------------------
-     Contact cards, rendered from SITE_CONFIG
-     --------------------------------------------------------------------- */
-  var contactGrid = $("#contactGrid");
-  if (contactGrid) {
-    var esc = window.PortfolioUtils.escapeHtml;
-    var cards = [];
-
-    if (CFG.email) {
-      cards.push(
-        '<div class="contact-card">' +
-          '<span class="contact-card__label">Email</span>' +
-          '<a class="contact-card__value" href="mailto:' + esc(CFG.email) + '">' + esc(CFG.email) + "</a>" +
-          '<p class="contact-card__note">Preferred for project enquiries and technical detail.</p>' +
-          '<a class="btn btn--primary btn--sm" href="mailto:' + esc(CFG.email) + '">Send Email</a>' +
-        "</div>"
-      );
-    }
-
-    if (CFG.whatsapp) {
-      cards.push(
-        '<div class="contact-card">' +
-          '<span class="contact-card__label">WhatsApp</span>' +
-          '<span class="contact-card__value">' + esc(CFG.whatsappDisplay || CFG.whatsapp) + "</span>" +
-          '<p class="contact-card__note">Direct message for quick technical discussion.</p>' +
-          '<a class="btn btn--ghost-invert btn--sm" href="https://wa.me/' + esc(CFG.whatsapp) +
-            '" target="_blank" rel="noopener noreferrer">WhatsApp</a>' +
-        "</div>"
-      );
-    }
-
-    cards.push(
-      '<div class="contact-card">' +
-        '<span class="contact-card__label">GitHub</span>' +
-        '<a class="contact-card__value" href="' + window.PortfolioUtils.githubProfileUrl() +
-          '" target="_blank" rel="noopener noreferrer">@' + esc(CFG.githubUsername) + "</a>" +
-        '<p class="contact-card__note">Source code and engineering project repositories.</p>' +
-        '<a class="btn btn--ghost-invert btn--sm" href="' + window.PortfolioUtils.githubProfileUrl() +
-          '" target="_blank" rel="noopener noreferrer">View GitHub</a>' +
-      "</div>"
-    );
-
-    if (CFG.linkedinUrl) {
-      cards.push(
-        '<div class="contact-card">' +
-          '<span class="contact-card__label">LinkedIn</span>' +
-          '<a class="contact-card__value" href="' + esc(CFG.linkedinUrl) +
-            '" target="_blank" rel="noopener noreferrer">Professional profile</a>' +
-          '<p class="contact-card__note">Professional network and background.</p>' +
-          '<a class="btn btn--ghost-invert btn--sm" href="' + esc(CFG.linkedinUrl) +
-            '" target="_blank" rel="noopener noreferrer">View LinkedIn</a>' +
-        "</div>"
-      );
-    } else {
-      cards.push(
-        '<div class="contact-card">' +
-          '<span class="contact-card__label">LinkedIn</span>' +
-          '<span class="contact-card__value" style="color:var(--ink-invert-muted)">Not published yet</span>' +
-          '<p class="contact-card__note">Set <code>linkedinUrl</code> in <code>js/config.js</code> to publish this link.</p>' +
-        "</div>"
-      );
-    }
-
-    contactGrid.innerHTML = cards.join("");
-  }
-
-  /* ---------------------------------------------------------------------
-     CV download — point at the configured path, and say so honestly if the
-     file has not been added to the repository yet.
-     --------------------------------------------------------------------- */
-  var cvLinks = $$('[id^="cvDownload"]');
-  var cvNote  = $("#cvNote");
-  if (cvLinks.length && CFG.cvPath) {
-    cvLinks.forEach(function (el) { el.setAttribute("href", CFG.cvPath); });
-    if (window.fetch) {
-      fetch(CFG.cvPath, { method: "HEAD" })
-        .then(function (res) {
-          if (res.ok) return;
-          throw new Error("missing");
-        })
-        .catch(function () {
-          cvLinks.forEach(function (el) {
-            el.classList.add("btn--outline");
-            el.classList.remove("btn--primary");
-            el.setAttribute("aria-disabled", "true");
-          });
-          if (cvNote) {
-            cvNote.textContent =
-              "PDF not uploaded yet. Add the file at " + CFG.cvPath +
-              " and these buttons start working — no other change is needed.";
-          }
-        });
-    }
-  }
 })();
