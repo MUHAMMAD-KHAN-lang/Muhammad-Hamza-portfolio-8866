@@ -49,10 +49,17 @@ const SITE_CONFIG = {
   // Leave as an empty string until a real profile URL is available.
   // An empty value renders a neutral "not yet published" state — it never
   // renders a broken or invented link.
-  linkedinUrl: "",
 
   /* --- Documents ------------------------------------------------------ */
   // Drop the PDF at this path and the Download CV buttons start working.
+  /* Experience is derived from these two dates at page load — never typed
+     into the markup. Both are set to 1 September so the site reproduces the
+     figures that were published before it became date-driven (2 practical,
+     ~6 development). Replace them with the real dates when known; the site
+     then keeps itself current with no further edits. */
+  practicalExperienceStartDate: "2024-09-01",
+  technicalDevelopmentStartDate: "2020-09-01",
+
   cvPath: "assets/documents/Muhammad_Hamza_CV.pdf"
 };
 

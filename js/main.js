@@ -249,20 +249,41 @@
         '<small>Source code and engineering project repositories.</small></span>' +
       '<span class="chan__a" aria-hidden="true">→</span></a>');
 
-    if (CFG.linkedinUrl) {
-      rows.push('<a href="' + e(CFG.linkedinUrl) + '" target="_blank" rel="noopener noreferrer">' +
-        '<span class="chan__k">LinkedIn</span>' +
-        '<span class="chan__v">Professional profile<small>Professional network and background.</small></span>' +
-        '<span class="chan__a" aria-hidden="true">→</span></a>');
-    } else {
-      rows.push('<div class="ch">' +
-        '<span class="chan__k">LinkedIn</span>' +
-        '<span class="chan__v" style="color:var(--tx-3)">Not published yet' +
-          '<small>Set <code>linkedinUrl</code> in js/config.js to publish this link.</small></span>' +
-        '<span class="chan__a" aria-hidden="true"></span></div>');
-    }
-
     box.innerHTML = rows.join("");
+  })();
+
+  /* ------------------------------------------------- 8 · experience years */
+  /* Completed years between a start date and today. "Completed" means the
+     anniversary has actually passed this year — on 31 Aug the count is still
+     the previous year's, on 1 Sep it increments. */
+  function calculateCompletedYears(startDate) {
+    var start = startDate instanceof Date ? startDate : new Date(String(startDate));
+    if (isNaN(start.getTime())) return null;
+
+    var now = new Date();
+    var years = now.getFullYear() - start.getFullYear();
+    var monthDiff = now.getMonth() - start.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < start.getDate())) years -= 1;
+    return years < 0 ? 0 : years;
+  }
+  window.EMH.years = calculateCompletedYears;
+
+  (function experience() {
+    var sources = {
+      practical: CFG.practicalExperienceStartDate,
+      technical: CFG.technicalDevelopmentStartDate
+    };
+    var pad = function (n) { return n < 10 ? "0" + n : String(n); };
+
+    $$("[data-yrs]").forEach(function (el) {
+      var key = el.getAttribute("data-yrs");
+      var years = sources[key] ? calculateCompletedYears(sources[key]) : null;
+      if (years === null) { el.textContent = "—"; return; }
+
+      var prefix = el.hasAttribute("data-approx") ? "~" : "";
+      el.textContent = prefix + pad(years);
+      el.setAttribute("datetime", "P" + years + "Y");
+    });
   })();
 
   /* -------------------------------------------------------------- 8 · CV */
@@ -276,13 +297,22 @@
     fetch(CFG.cvPath, { method: "HEAD" })
       .then(function (r) { if (!r.ok) throw new Error("missing"); })
       .catch(function () {
+        /* No file behind the link: say so plainly rather than handing the
+           visitor a button that downloads a 404. */
         links.forEach(function (el) {
           el.classList.remove("btn--fill");
           el.classList.add("btn--line");
           el.setAttribute("aria-disabled", "true");
+          el.removeAttribute("download");
+          if (note && note.id) el.setAttribute("aria-describedby", note.id);
+          el.textContent = "CV not published yet";
+          el.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            if (note) { note.setAttribute("tabindex", "-1"); note.focus(); }
+          });
         });
         if (note) {
-          note.textContent = "PDF not uploaded yet — add " + CFG.cvPath + " and the button starts working.";
+          note.textContent = "The PDF is not published yet. The engineering profile page carries the same material.";
         }
       });
   })();
