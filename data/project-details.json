@@ -1,0 +1,30 @@
+{
+  "_schema": {
+    "purpose": "Optional hand-written technical detail for selected projects. Keyed by exact GitHub repository name. Anything omitted simply is not shown — the project detail page never invents content.",
+    "fields": {
+      "problem": "The engineering problem being solved.",
+      "objective": "What the project was required to achieve.",
+      "approach": "The engineering approach taken.",
+      "architecture": "System architecture and subsystem breakdown.",
+      "model": "Mathematical model, governing equations, assumptions.",
+      "implementation": "How it was built: hardware, software, tooling.",
+      "results": "Measured or observed outcomes. State only what was actually observed.",
+      "images": ["Relative paths, e.g. ../assets/images/example-diagram.png"],
+      "documentation": "URL to further documentation, if any."
+    },
+    "example": {
+      "my-repository-name": {
+        "problem": "…",
+        "objective": "…",
+        "approach": "…",
+        "architecture": "…",
+        "model": "…",
+        "implementation": "…",
+        "results": "…",
+        "images": [],
+        "documentation": ""
+      }
+    }
+  },
+  "projects": {}
+}
