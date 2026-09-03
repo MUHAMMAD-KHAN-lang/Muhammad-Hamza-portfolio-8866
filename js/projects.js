@@ -1,15 +1,13 @@
 /* ==========================================================================
-   projects.js — project explorer and project detail pages
+   projects.js — project index and per-project case-study pages
    --------------------------------------------------------------------------
-   Two modes, one file, driven by the query string:
-     projects/                 → full explorer of every discovered project
-     projects/?repo=<name>     → detail page for one repository
+     projects/               → the full index of public repositories
+     projects/?repo=<name>   → one project, presented as a case study
 
-   Detail content comes from two honest sources only:
-     1. Real GitHub repository metadata.
-     2. Optional hand-written sections in data/project-details.json.
-   Nothing is inferred from a repository name. Missing sections are shown as
-   explicit placeholders rather than invented.
+   Detail content has exactly two honest sources: real repository metadata,
+   and optional hand-written sections in data/project-details.json. Nothing is
+   inferred from a repository name; missing sections are shown as explicit
+   placeholders rather than invented.
    ========================================================================== */
 (function () {
   "use strict";
@@ -17,29 +15,55 @@
   var CFG   = window.SITE_CONFIG || {};
   var PCFG  = window.PROJECT_CONFIG || {};
   var RULES = window.DOMAIN_RULES || [];
-  var U     = window.PortfolioUtils;
-  var esc   = U.escapeHtml;
+  var E     = window.EMH || {};
+  var esc   = E.esc || function (s) { return s; };
+  var fdate = E.date || function (s) { return s; };
 
-  var root = document.getElementById("projectApp");
-  if (!root) return;
+  var app = document.getElementById("app");
+  if (!app) return;
 
-  var params  = new URLSearchParams(window.location.search);
-  var repoArg = (params.get("repo") || "").trim();
-  var PROFILE_URL = U.githubProfileUrl();
+  var repoArg = (new URLSearchParams(window.location.search).get("repo") || "").trim();
+  var PROFILE = E.gh ? E.gh() : ("https://github.com/" + (CFG.githubUsername || ""));
 
-  /* ------------------------------------------------------------------ */
-  function lower(list) { return (list || []).map(function (t) { return String(t).toLowerCase(); }); }
-  function hasAny(topics, candidates) {
-    for (var i = 0; i < topics.length; i++) if (candidates.indexOf(topics[i]) !== -1) return true;
-    return false;
-  }
-  function resolveDomain(topics, language, text) {
-    for (var i = 0; i < RULES.length; i++) if (hasAny(topics, RULES[i].match)) return RULES[i].label;
+  function low(a) { return (a || []).map(function (t) { return String(t).toLowerCase(); }); }
+  function any(t, c) { for (var i = 0; i < t.length; i++) if (c.indexOf(t[i]) !== -1) return true; return false; }
+
+  function domainOf(topics, lang, text) {
+    for (var i = 0; i < RULES.length; i++) if (any(topics, RULES[i].match)) return RULES[i].label;
     if (/\buav|drone|quadcopter|flight\b/.test(text)) return "UAV / UAS";
     if (/\bcontrol|pid|kalman|observer\b/.test(text)) return "Control Systems";
     if (/\bembedded|firmware|microcontroller\b/.test(text)) return "Embedded Systems";
-    if (language) return "Computational Engineering";
+    if (lang) return "Computational Engineering";
     return "Engineering";
+  }
+
+  function initials(name) {
+    var p = String(name || "").split(/[^A-Za-z0-9]+/).filter(Boolean);
+    if (!p.length) return "—";
+    if (p.length === 1) return p[0].slice(0, 3).toUpperCase();
+    return p.slice(0, 3).map(function (x) { return x[0]; }).join("").toUpperCase();
+  }
+
+  function shape(repo) {
+    var topics = low(repo.topics);
+    var text = String(repo.name || "").toLowerCase().replace(/[-_]/g, " ") + " " +
+               String(repo.description || "").toLowerCase();
+    return {
+      name: repo.name,
+      desc: repo.description || "",
+      url: repo.html_url || ("https://github.com/" + CFG.githubUsername + "/" + repo.name),
+      home: repo.homepage || "",
+      lang: repo.language || "",
+      topics: repo.topics || [],
+      branch: repo.default_branch || "main",
+      license: repo.license || null,
+      created: repo.created_at || "",
+      upd: repo.pushed_at || repo.updated_at || "",
+      archived: !!repo.archived,
+      featured: topics.indexOf(String(PCFG.featuredTopic || "").toLowerCase()) !== -1,
+      domain: domainOf(topics, repo.language, text),
+      ini: initials(repo.name)
+    };
   }
 
   function loadRepos() {
@@ -47,7 +71,7 @@
         "/repos?per_page=100&sort=updated&type=owner", { headers: { Accept: "application/vnd.github+json" } })
       .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
 
-    var snapshot = fetch("../data/projects.json", { cache: "no-cache" })
+    var snap = fetch("../data/projects.json", { cache: "no-cache" })
       .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
       .then(function (p) {
         var repos = Array.isArray(p) ? p : (p.repositories || []);
@@ -55,7 +79,7 @@
         return repos;
       });
 
-    return live.catch(function () { return snapshot; });
+    return live.catch(function () { return snap; });
   }
 
   function loadDetails() {
@@ -65,110 +89,76 @@
       .catch(function () { return {}; });
   }
 
-  function decorate(repo) {
-    var topics = lower(repo.topics);
-    var text   = String(repo.name || "").toLowerCase().replace(/[-_]/g, " ") + " " +
-                 String(repo.description || "").toLowerCase();
-    return {
-      name: repo.name,
-      description: repo.description || "",
-      url: repo.html_url || ("https://github.com/" + CFG.githubUsername + "/" + repo.name),
-      homepage: repo.homepage || "",
-      language: repo.language || "",
-      topics: repo.topics || [],
-      stars: repo.stargazers_count || 0,
-      forks: repo.forks_count || 0,
-      license: repo.license || null,
-      branch: repo.default_branch || "main",
-      created: repo.created_at || "",
-      updated: repo.pushed_at || repo.updated_at || "",
-      archived: !!repo.archived,
-      featured: topics.indexOf(String(PCFG.featuredTopic || "").toLowerCase()) !== -1,
-      domain: resolveDomain(topics, repo.language, text)
-    };
+  function plate(p) {
+    return '<div class="plate">' +
+      '<span class="plate__c"></span><span class="plate__c"></span>' +
+      '<span class="plate__c"></span><span class="plate__c"></span>' +
+      '<span class="plate__acc"></span>' +
+      '<span class="plate__cn"><span class="plate__ini">' + esc(p.ini) + '</span></span>' +
+      (p.lang ? '<span class="plate__lang">' + esc(p.lang) + '</span>' : '') + '</div>';
   }
 
-  /* ================================================================== */
-  /*  Detail page                                                        */
-  /* ================================================================== */
-  function renderDetail(repo, detail) {
-    var p = decorate(repo);
+  /* ------------------------------------------------------------- detail */
+  function detail(repo, d) {
+    var p = shape(repo);
     document.title = p.name + " — Engineer Muhammad Hamza";
+    var t = document.getElementById("pageTitle"), l = document.getElementById("pageLede");
+    if (t) t.textContent = p.name;
+    if (l) l.textContent = p.desc || "No repository description provided.";
 
     var sections = [
-      ["Problem",             detail.problem],
-      ["Objective",           detail.objective],
-      ["Engineering Approach", detail.approach],
-      ["Architecture",        detail.architecture],
-      ["Mathematical Model",  detail.model],
-      ["Implementation",      detail.implementation],
-      ["Results",             detail.results]
-    ];
+      ["Problem", d.problem], ["Objective", d.objective],
+      ["Engineering approach", d.approach], ["Architecture", d.architecture],
+      ["Mathematical model", d.model], ["Implementation", d.implementation],
+      ["Results", d.results]
+    ].filter(function (s) { return s[1]; });
 
-    var written = sections.filter(function (s) { return s[1]; });
-
-    var body = written.length
-      ? written.map(function (s) {
-          return '<section class="cv-block"><h2 class="cv-block__title">' + esc(s[0]) + "</h2>" +
-                 "<p>" + esc(s[1]) + "</p></section>";
+    var written = sections.length
+      ? sections.map(function (s, i) {
+          return '<div class="blk rv"><h2 class="blk__t"><span>' + esc(s[0]) + '</span><span>' +
+                 ("0" + (i + 1)).slice(-2) + '</span></h2><p class="body">' + esc(s[1]) + '</p></div>';
         }).join("")
-      : '<section class="cv-block">' +
-          '<h2 class="cv-block__title">Technical Detail</h2>' +
-          '<div class="state" style="text-align:left">' +
-            "<p style=\"margin-bottom:.75rem\">An extended technical write-up for this project — problem, objective, " +
-            "engineering approach, architecture, mathematical model, implementation and results — " +
-            "has not been published on this site yet.</p>" +
-            "<p style=\"margin:0\">The repository itself, including its README and source, is the " +
-            "authoritative record in the meantime.</p>" +
-          "</div>" +
-        "</section>";
+      : '<div class="blk rv"><h2 class="blk__t"><span>Technical detail</span><span>—</span></h2>' +
+        '<div class="state" style="text-align:left">' +
+        '<p style="margin-bottom:.75rem">An extended write-up for this project — problem, objective, ' +
+        'engineering approach, architecture, mathematical model, implementation and results — has not ' +
+        'been published on this site yet.</p>' +
+        '<p>The repository itself, including its README and source, is the authoritative record in the ' +
+        'meantime.</p></div></div>';
 
-    var images = (detail.images || []).length
-      ? '<section class="cv-block"><h2 class="cv-block__title">Diagrams &amp; Images</h2>' +
-          '<div class="grid grid--2">' +
-            detail.images.map(function (src) {
-              return '<img src="' + esc(src) + '" alt="' + esc(p.name) + ' project figure" loading="lazy" style="border:1px solid var(--line);border-radius:4px">';
-            }).join("") +
-          "</div></section>"
+    var images = (d.images || []).length
+      ? '<div class="blk rv"><h2 class="blk__t"><span>Diagrams &amp; images</span><span>FIG</span></h2>' +
+        '<div class="split" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))">' +
+        d.images.map(function (src) {
+          return '<img src="' + esc(src) + '" alt="' + esc(p.name) + ' figure" loading="lazy" style="border:1px solid var(--rule)">';
+        }).join("") + '</div></div>'
       : "";
 
-    root.innerHTML =
-      '<div class="cv-header">' +
-        '<p class="section-index">Project &nbsp;/&nbsp; ' + esc(p.domain) + "</p>" +
-        "<h1 style=\"font-size:clamp(1.8rem,4vw,2.6rem)\">" + esc(p.name) + "</h1>" +
-        (p.description
-          ? "<p style=\"color:var(--ink-muted);font-size:1.05rem\">" + esc(p.description) + "</p>"
-          : "<p style=\"color:var(--ink-faint);font-style:italic\">No repository description provided.</p>") +
-        (p.topics.length
-          ? '<div class="tag-row" style="margin:1rem 0">' +
-              p.topics.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") +
-            "</div>"
-          : "") +
-        '<div class="btn-row" style="margin-top:1.25rem">' +
-          '<a class="btn btn--primary" href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">View Repository</a>' +
-          (p.homepage ? '<a class="btn btn--outline" href="' + esc(p.homepage) + '" target="_blank" rel="noopener noreferrer">Live Site</a>' : "") +
-          (detail.documentation ? '<a class="btn btn--outline" href="' + esc(detail.documentation) + '" target="_blank" rel="noopener noreferrer">Documentation</a>' : "") +
-          '<a class="btn btn--outline" href="./">All Projects</a>' +
-        "</div>" +
-      "</div>" +
+    app.innerHTML =
+      '<div class="split--flip split rv" style="margin-bottom:clamp(2rem,5vw,3rem)">' +
+        '<dl class="feat__meta">' +
+          '<div><dt>Domain</dt><dd>' + esc(p.domain) + '</dd></div>' +
+          '<div><dt>Language</dt><dd>' + esc(p.lang || "Not specified") + '</dd></div>' +
+          '<div><dt>Topics</dt><dd>' + esc(p.topics.join(" · ") || "None") + '</dd></div>' +
+          '<div><dt>Branch</dt><dd>' + esc(p.branch) + '</dd></div>' +
+          '<div><dt>Created</dt><dd>' + esc(fdate(p.created)) + '</dd></div>' +
+          '<div><dt>Updated</dt><dd>' + esc(fdate(p.upd)) + '</dd></div>' +
+        '</dl>' +
+        '<div>' + plate(p) +
+          '<div class="btns" style="margin-top:1.25rem">' +
+            '<a class="btn btn--fill" href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">Open repository <span class="ar" aria-hidden="true">→</span></a>' +
+            (p.home ? '<a class="btn btn--line" href="' + esc(p.home) + '" target="_blank" rel="noopener noreferrer">Live site</a>' : '') +
+            (d.documentation ? '<a class="btn btn--line" href="' + esc(d.documentation) + '" target="_blank" rel="noopener noreferrer">Documentation</a>' : '') +
+            '<a class="btn btn--line" href="./">All projects</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>' + written + images;
 
-      '<section class="cv-block"><h2 class="cv-block__title">Repository Metadata</h2>' +
-        '<dl class="deflist">' +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Domain</dt><dd class=\"deflist__desc\">" + esc(p.domain) + "</dd></div>" +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Primary language</dt><dd class=\"deflist__desc\">" + esc(p.language || "Not specified") + "</dd></div>" +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Topics</dt><dd class=\"deflist__desc\">" + esc(p.topics.join(", ") || "None") + "</dd></div>" +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Default branch</dt><dd class=\"deflist__desc\">" + esc(p.branch) + "</dd></div>" +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Created</dt><dd class=\"deflist__desc\">" + esc(U.formatDate(p.created)) + "</dd></div>" +
-          "<div class=\"deflist__row\"><dt class=\"deflist__term\">Last updated</dt><dd class=\"deflist__desc\">" + esc(U.formatDate(p.updated)) + "</dd></div>" +
-        "</dl></section>" +
-
-      body + images;
+    show();
   }
 
-  /* ================================================================== */
-  /*  Explorer                                                           */
-  /* ================================================================== */
-  function renderExplorer(repos) {
+  /* -------------------------------------------------------------- index */
+  function index(repos) {
     var items = repos
       .filter(function (r) {
         var n = String(r.name || "").toLowerCase();
@@ -177,82 +167,56 @@
         return n !== String(CFG.repoName || "").toLowerCase() &&
                n !== String(CFG.githubUsername || "").toLowerCase();
       })
-      .map(decorate)
+      .map(shape)
       .sort(function (a, b) {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        return Date.parse(b.updated || 0) - Date.parse(a.updated || 0);
+        return Date.parse(b.upd || 0) - Date.parse(a.upd || 0);
       });
 
     if (!items.length) {
-      root.innerHTML = '<div class="state"><h3>No public repositories found</h3>' +
+      app.innerHTML = '<div class="state"><h3>No public repositories found</h3>' +
         '<p>Projects appear here automatically once public repositories are published.</p></div>';
       return;
     }
 
-    root.innerHTML =
-      '<div class="cv-header">' +
-        '<p class="section-index">Project Portfolio</p>' +
-        "<h1 style=\"font-size:clamp(1.8rem,4vw,2.6rem)\">All Engineering Projects</h1>" +
-        "<p style=\"color:var(--ink-muted)\">Every public repository, listed automatically from GitHub. " +
-        "Select a project to open its detail page.</p>" +
-        '<div class="btn-row" style="margin-top:1.25rem">' +
-          '<a class="btn btn--outline" href="../index.html#projects">Back to portfolio</a>' +
-          '<a class="btn btn--outline" href="' + PROFILE_URL + '" target="_blank" rel="noopener noreferrer">GitHub profile</a>' +
-        "</div>" +
-      "</div>" +
-      '<div class="project-grid">' +
-        items.map(function (p) {
-          return '<article class="project-card' + (p.featured ? " project-card--featured" : "") + '">' +
-            '<div class="project-card__top"><span class="pill' + (p.featured ? " pill--featured" : "") + '">' +
-              esc(p.domain) + "</span></div>" +
-            '<h3 class="project-card__title"><a href="?repo=' + encodeURIComponent(p.name) + '">' + esc(p.name) + "</a></h3>" +
-            (p.description
-              ? '<p class="project-card__desc">' + esc(p.description) + "</p>"
-              : '<p class="project-card__desc is-empty">No repository description provided.</p>') +
-            '<dl class="project-card__meta">' +
-              "<div><dt>Language</dt><dd>" + esc(p.language || "Not specified") + "</dd></div>" +
-              "<div><dt>Updated</dt><dd>" + esc(U.formatDate(p.updated)) + "</dd></div>" +
-            "</dl>" +
-            '<div class="project-card__actions">' +
-              '<a class="btn btn--solid btn--sm" href="?repo=' + encodeURIComponent(p.name) + '">View Details</a>' +
-              '<a class="btn btn--outline btn--sm" href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">Repository</a>' +
-            "</div></article>";
-        }).join("") +
-      "</div>";
+    app.innerHTML = '<div class="rows rv" style="border-top:0">' + items.map(function (p, i) {
+      return '<a class="prjlink" href="?repo=' + encodeURIComponent(p.name) + '">' +
+        '<span class="prjlink__no">' + ("0" + (i + 1)).slice(-2) + '</span>' +
+        '<span class="prjlink__n">' + esc(p.name) + (p.featured ? ' <span style="color:var(--accent-tx);font-family:var(--mono);font-size:.6rem;letter-spacing:.14em">FEATURED</span>' : '') + '</span>' +
+        '<span class="prjlink__d">' + esc(p.desc || "No description provided") + '</span>' +
+        '<span class="prjlink__m">' + esc(p.domain) + '</span>' +
+        '<span class="prjlink__a" aria-hidden="true">→</span></a>';
+    }).join("") + '</div>';
+    show();
   }
 
-  function renderFailure() {
-    root.innerHTML =
-      '<div class="state">' +
-        "<h3>Projects unavailable</h3>" +
-        "<p>Project repositories are temporarily unavailable. Please visit GitHub directly to view the " +
-        "latest engineering work.</p>" +
-        '<div class="btn-row" style="justify-content:center;margin-top:1.25rem">' +
-          '<a class="btn btn--primary btn--sm" href="' + PROFILE_URL + '" target="_blank" rel="noopener noreferrer">Open GitHub</a>' +
-        "</div></div>";
+  function show() {
+    Array.prototype.forEach.call(app.querySelectorAll(".rv"), function (el) { el.classList.add("in"); });
   }
 
-  /* ------------------------------------------------------------------ */
+  function failed() {
+    app.innerHTML = '<div class="state"><h3>Projects unavailable</h3>' +
+      '<p>Project repositories are temporarily unavailable. Please visit GitHub directly to view the ' +
+      'latest engineering work.</p><p style="margin-top:1.25rem">' +
+      '<a class="alink" href="' + PROFILE + '" target="_blank" rel="noopener noreferrer">Open GitHub <span class="ar" aria-hidden="true">→</span></a></p></div>';
+  }
+
   Promise.all([loadRepos(), loadDetails()])
     .then(function (res) {
-      var repos = res[0] || [];
-      var details = res[1] || {};
+      var repos = res[0] || [], details = res[1] || {};
+      if (!repoArg) { index(repos); return; }
 
-      if (!repoArg) { renderExplorer(repos); return; }
-
-      var match = repos.filter(function (r) {
+      var hit = repos.filter(function (r) {
         return String(r.name).toLowerCase() === repoArg.toLowerCase();
       })[0];
 
-      if (!match) {
-        root.innerHTML =
-          '<div class="state"><h3>Project not found</h3>' +
-          "<p>No public repository named <strong>" + esc(repoArg) + "</strong> was found on this account.</p>" +
-          '<div class="btn-row" style="justify-content:center;margin-top:1.25rem">' +
-            '<a class="btn btn--outline btn--sm" href="./">All projects</a></div></div>';
+      if (!hit) {
+        app.innerHTML = '<div class="state"><h3>Project not found</h3>' +
+          '<p>No public repository named <strong>' + esc(repoArg) + '</strong> was found on this account.</p>' +
+          '<p style="margin-top:1.25rem"><a class="alink" href="./">All projects <span class="ar" aria-hidden="true">→</span></a></p></div>';
         return;
       }
-      renderDetail(match, details[match.name] || {});
+      detail(hit, details[hit.name] || {});
     })
-    .catch(renderFailure);
+    .catch(failed);
 })();

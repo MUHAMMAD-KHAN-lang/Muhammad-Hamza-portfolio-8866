@@ -13,6 +13,26 @@ const SITE_CONFIG = {
   domain: "UAV / UAS / Drone Engineering",
   tagline: "Model. Design. Integrate. Control. Optimize.",
 
+  /* --- Brand ---------------------------------------------------------- */
+  // The monogram carries all three letters in one square figure:
+  //   H = the two full-height rails + the bar between them
+  //   M = the chevron dropping between the rails
+  //   E = the left rail + the three arms stepping off it
+  // Assets and usage rules: assets/branding/README.md
+  brand: {
+    mark:      "assets/branding/emh-mark.svg",       // currentColor, for inline use
+    light:     "assets/branding/emh-logo-light.svg", // graphite, for ivory grounds
+    dark:      "assets/branding/emh-logo-dark.svg",  // ivory, for graphite grounds
+    accent:    "assets/branding/emh-logo-accent.svg",
+    favicon:   "assets/branding/favicon.svg",
+    ogImage:   "assets/branding/og-cover.png",
+    graphite:  "#171614",
+    ivory:     "#F5F1EA",
+    copper:    "#C2683A",
+    copperUp:  "#E0894F",
+    copperDeep:"#8A4A2A"
+  },
+
   /* --- GitHub --------------------------------------------------------- */
   // The ONLY place the GitHub username is defined.
   githubUsername: "MUHAMMAD-KHAN-lang",
@@ -24,7 +44,7 @@ const SITE_CONFIG = {
   /* --- Contact -------------------------------------------------------- */
   email: "MuhammadKhan90876@gmail.com",
   whatsapp: "923020198866",          // international format, digits only
-  whatsappDisplay: "0302 019 8866",
+  whatsappDisplay: "+92 302 0198866",
 
   // Leave as an empty string until a real profile URL is available.
   // An empty value renders a neutral "not yet published" state — it never
