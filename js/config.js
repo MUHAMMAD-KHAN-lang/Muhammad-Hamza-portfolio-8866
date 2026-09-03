@@ -52,13 +52,16 @@ const SITE_CONFIG = {
 
   /* --- Documents ------------------------------------------------------ */
   // Drop the PDF at this path and the Download CV buttons start working.
-  /* Experience is derived from these two dates at page load — never typed
-     into the markup. Both are set to 1 September so the site reproduces the
-     figures that were published before it became date-driven (2 practical,
-     ~6 development). Replace them with the real dates when known; the site
-     then keeps itself current with no further edits. */
-  practicalExperienceStartDate: "2024-09-01",
-  technicalDevelopmentStartDate: "2020-09-01",
+  /* Experience is derived from these two start points at page load — never
+     typed into the markup. A bare year is treated as 1 January of that year,
+     so the count rolls over with the calendar. Supply a full "YYYY-MM-DD"
+     instead if the figure should turn on an exact anniversary. */
+  /* Used only to compute the age shown on the profile page. The date itself
+     is never rendered. */
+  dateOfBirth: "2004-05-20",
+
+  practicalExperienceStartDate: "2024",
+  technicalDevelopmentStartDate: "2020",
 
   cvPath: "assets/documents/Muhammad_Hamza_CV.pdf"
 };
