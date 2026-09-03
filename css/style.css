@@ -187,18 +187,21 @@ section { position: relative; }
 .band { padding-block: var(--sec); position: relative; overflow: hidden; }
 .band > .wrap { position: relative; z-index: 2; }
 
-/* Editorial split: label column + content column */
+/* ONE editorial column axis for the whole document.
+   Every two-column section divides the wrap 5 : 7 with the same gutter, so
+   the second column starts on the same vertical line in every section and
+   the page reads as one grid rather than a stack of separate layouts. */
 .split > * { min-width: 0; }
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   gap: clamp(1.75rem, 5vw, 5rem);
   align-items: start;
 }
-.split--wide { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
-.split--flip { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+/* Figure-led sections balance their two tracks against each other. */
+.split--fig { align-items: center; }
 @media (max-width: 900px) {
-  .split, .split--wide, .split--flip { grid-template-columns: 1fr; gap: 2rem; }
+  .split, .split--fig { grid-template-columns: 1fr; gap: 2rem; }
 }
 
 .stack > * + * { margin-top: 1.15em; }
@@ -303,7 +306,9 @@ h3.sub {
 
 /* Over the dark hero the nav is light; once past it, it inverts. */
 .hdr { color: var(--iv-100); }
-.hdr.solid {
+/* The bar reads the theme of whatever band is under it. Both states are
+   fully opaque; only the palette changes. */
+.hdr[data-theme="light"] {
   background: var(--sn-050);
   border-bottom-color: var(--sn-400);
   color: var(--gr-900);
@@ -314,7 +319,7 @@ h3.sub {
   width: 54px; flex: none; color: var(--cu-lift);
   transition: transform var(--t-fast), color var(--t-fast), opacity var(--t-fast);
 }
-.hdr.solid .brand__mark { color: var(--cu); }
+.hdr[data-theme="light"] .brand__mark { color: var(--cu); }
 .brand:hover .brand__mark { transform: translateY(-1px); opacity: .82; }
 .brand__txt { display: flex; flex-direction: column; line-height: 1.1; }
 .brand__nm { font-size: .84rem; font-weight: 600; letter-spacing: .01em; }
@@ -338,7 +343,7 @@ h3.sub {
 .nav a:hover { opacity: 1; }
 .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
 .nav a.on { opacity: 1; color: var(--cu-lift); }
-.hdr.solid .nav a.on { color: var(--cu-deep); }
+.hdr[data-theme="light"] .nav a.on { color: var(--cu-deep); }
 .nav a.on::after { transform: scaleX(1); }
 
 .burger {
@@ -370,8 +375,8 @@ h3.sub {
   .nav { flex-direction: column; align-items: stretch; gap: 0; }
   .nav a { padding: .95rem .1rem; font-size: .8rem; border-bottom: 1px solid rgba(245,241,234,.1); opacity: .9; }
   .nav a::after { display: none; }
-  .hdr.solid .navwrap { background: var(--sn-050); color: var(--gr-900); border-bottom-color: var(--sn-400); }
-  .hdr.solid .nav a { border-bottom-color: var(--sn-300); }
+  .hdr[data-theme="light"] .navwrap { background: var(--sn-050); color: var(--gr-900); border-bottom-color: var(--sn-400); }
+  .hdr[data-theme="light"] .nav a { border-bottom-color: var(--sn-300); }
 }
 
 /* --------------------------------------------------------------------------
@@ -428,7 +433,9 @@ h3.sub {
 }
 .hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  /* The drawing is a primary hero element, not an ornament: it gets the
+     wider track. Row 2 carries the data strip across both columns. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
   align-items: center; width: 100%;
 }
@@ -446,17 +453,20 @@ h3.sub {
 
 .hero__name {
   font-size: clamp(2.5rem, 7vw, 5.1rem);
-  line-height: .93; letter-spacing: -.045em; color: #fff;
-  margin-bottom: .28em;
+  /* Inter's ascender + descender is ~1.115em. At line-height .93 the
+     descender of "Engineer" physically landed on the cap height of
+     "Muhammad" below it, which is what made the g read as broken. The
+     minimum that clears it is (descender .22em + cap .735em) = .955em;
+     1.04 keeps the display-tight feel and leaves ~7% optical air. */
+  line-height: 1.04; letter-spacing: -.045em; color: #fff;
+  margin-bottom: .3em;
 }
 .hero__name .ln {
   display: block; overflow: hidden;
-  /* line-height .93 crops the em box, so the descender of the "g" in
-     "Engineer" fell outside the reveal mask and was clipped. Pad the mask
-     so the descender lives inside it, then pull the space back out so the
-     optical line rhythm is unchanged. */
-  padding-bottom: .18em;
-  margin-bottom: -.18em;
+  /* The reveal mask still has to be taller than the line box, or it clips
+     the same descender it no longer collides with. */
+  padding-bottom: .16em;
+  margin-bottom: -.16em;
 }
 .hero__name .ln > span { display: block; }
 /* The travel has to clear the padded box, or the glyph tops peek out
@@ -468,7 +478,8 @@ h3.sub {
   font-size: clamp(1.05rem, 2vw, 1.55rem);
   font-weight: 400; letter-spacing: -.02em; line-height: 1.2;
   color: var(--cu-lift);
-  max-width: 20ch; margin-bottom: 1.5rem;
+  /* Two lines in the hero's text track, not three. */
+  max-width: 24ch; margin-bottom: 1.5rem;
 }
 .hero__dom {
   font-family: var(--mono); font-size: clamp(.62rem, 1.3vw, .72rem);
@@ -483,12 +494,28 @@ h3.sub {
   color: #B9B2A8; font-size: clamp(.95rem, 1.2vw, 1.05rem);
   max-width: 48ch; margin-bottom: 2.2rem;
 }
-.hero__btns { margin-bottom: 2.6rem; }
+.hero__btns { margin-bottom: 0; }
 .hero .btn { color: var(--iv-100); border-color: rgba(245,241,234,.28); }
 .hero .btn:hover { border-color: var(--iv-100); background: rgba(245,241,234,.07); }
 .hero .btn--fill { color: var(--gr-900); }
 
-.hero__stats { display: flex; flex-wrap: wrap; gap: clamp(1.5rem, 4vw, 3.5rem); }
+.hero__stats {
+  /* One measured data strip on the page grid rather than a ragged wrap
+     inside the text column. */
+  grid-column: 1 / -1;
+  display: grid;
+  /* Explicit tracks, not auto-fit: five items must not leave ragged empty
+     cells at the end of the strip. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.1rem, 2.5vw, 2.25rem);
+  margin-top: clamp(2.25rem, 5vw, 3.5rem);
+  padding-top: clamp(1.15rem, 2.5vw, 1.6rem);
+  border-top: 1px solid rgba(245, 241, 234, .13);
+}
+@media (max-width: 359px)  { .hero__stats { grid-template-columns: 1fr; } }
+@media (min-width: 700px)  { .hero__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1080px) { .hero__stats { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
 .hero__stat dt {
   font-family: var(--mono); font-size: .6rem;
   letter-spacing: .18em; text-transform: uppercase; color: #78716A;
@@ -542,7 +569,7 @@ h3.sub {
 /* Minimum rendered widths: chosen so the smallest label in each figure stays
    at ~9px on screen instead of scaling away with the drawing. */
 @media (max-width: 900px) { .fig--loop { min-width: 800px; } }
-@media (max-width: 620px) { .fig--uav  { min-width: 430px; } }
+@media (max-width: 620px) { .fig--uav  { min-width: 440px; } }
 
 /* --------------------------------------------------------------------------
    11 · Statement rule (between hero and about)
@@ -582,6 +609,12 @@ h3.sub {
 /* --------------------------------------------------------------------------
    13 · Capability system map
    -------------------------------------------------------------------------- */
+/* The stack is the left half of one idea, so it stays beside the
+   competencies it introduces instead of ending in an empty column. */
+@media (min-width: 1000px) {
+  .flowwrap { position: sticky; top: calc(4.75rem + clamp(1.5rem, 4vh, 3rem)); }
+}
+
 .chain { display: grid; gap: 0; margin-top: 1rem; }
 .chain__row {
   display: grid; grid-template-columns: 3.5rem 1fr; gap: clamp(1rem, 3vw, 2.25rem);
