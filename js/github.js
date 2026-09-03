@@ -297,8 +297,16 @@
 
   function paintAll(repos, src, at) {
     var list = prepare(repos);
-    if (!list.length) { if (!S.done) empty(); return; }
     S.list = list; S.src = src; S.at = at || null;
+
+    /* "Nothing to show" is not the same as "no repositories". A profile made
+       only of unclassified repositories still has nothing engineering to
+       list, so it gets the empty state — and the show-all toggle, which
+       paintActions() builds from S.list, still reveals them on request. */
+    var shown = list.filter(function (p) { return p.tier !== "other"; });
+    if (!shown.length && !S.showAll) { empty(); return; }
+    if (!list.length) { empty(); return; }
+
     paintFilters(); paintList(); paintActions();
   }
 
