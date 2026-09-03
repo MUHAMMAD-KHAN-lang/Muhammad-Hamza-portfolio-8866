@@ -119,19 +119,32 @@
 
   /* --------------------------------------------------- 4 · header + nav */
   var hdr = $("#hdr");
-  var hero = $(".hero");
 
   if (hdr) {
-    if (hero && HAS_IO) {
-      var hio = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { hdr.classList.toggle("solid", !e.isIntersecting); });
-      }, { rootMargin: "-72px 0px 0px 0px", threshold: 0 });
-      hio.observe(hero);
-    } else {
-      var onScroll = function () { hdr.classList.toggle("solid", window.scrollY > 40); };
-      onScroll();
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
+    /* The bar takes the theme of whichever band sits under it. Bands declare
+       their own theme, so adding a section never means editing this file. */
+    var bands = $$("[data-header-theme]");
+    var probe  = function () { return hdr.getBoundingClientRect().height * 0.55; };
+
+    var applyTheme = function () {
+      var y = probe(), theme = "dark";
+      for (var i = 0; i < bands.length; i++) {
+        var r = bands[i].getBoundingClientRect();
+        if (r.top <= y && r.bottom > y) { theme = bands[i].getAttribute("data-header-theme"); break; }
+      }
+      if (hdr.getAttribute("data-theme") !== theme) hdr.setAttribute("data-theme", theme);
+    };
+
+    var queued = false;
+    var onScroll = function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () { applyTheme(); queued = false; });
+    };
+
+    applyTheme();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
   }
 
   var burger = $("#burger"), navwrap = $("#navwrap");
