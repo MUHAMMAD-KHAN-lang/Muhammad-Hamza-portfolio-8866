@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/sitemap.xml
