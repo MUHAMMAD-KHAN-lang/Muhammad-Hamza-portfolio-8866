@@ -257,8 +257,17 @@
      anniversary has actually passed this year — on 31 Aug the count is still
      the previous year's, on 1 Sep it increments. */
   function calculateCompletedYears(startDate) {
-    var start = startDate instanceof Date ? startDate : new Date(String(startDate));
-    if (isNaN(start.getTime())) return null;
+    var start;
+    if (startDate instanceof Date) {
+      start = startDate;
+    } else {
+      var raw = String(startDate == null ? "" : startDate).trim();
+      /* A bare year means "since <year>" — count from 1 January, local time,
+         so the figure turns over with the calendar rather than at an hour
+         that depends on the reader's timezone. */
+      start = /^\d{4}$/.test(raw) ? new Date(Number(raw), 0, 1) : new Date(raw);
+    }
+    if (!start || isNaN(start.getTime())) return null;
 
     var now = new Date();
     var years = now.getFullYear() - start.getFullYear();
@@ -280,9 +289,20 @@
       var years = sources[key] ? calculateCompletedYears(sources[key]) : null;
       if (years === null) { el.textContent = "—"; return; }
 
+      /* The two-digit form belongs to the display figures; inside running
+         prose the number reads as a number. */
       var prefix = el.hasAttribute("data-approx") ? "~" : "";
-      el.textContent = prefix + pad(years);
+      el.textContent = prefix + (el.hasAttribute("data-plain") ? String(years) : pad(years));
       el.setAttribute("datetime", "P" + years + "Y");
+    });
+
+    /* Age comes off the same arithmetic. Not padded — it is a plain number,
+       not one of the two-digit engineering figures. */
+    var age = CFG.dateOfBirth ? calculateCompletedYears(CFG.dateOfBirth) : null;
+    $$("[data-age]").forEach(function (el) {
+      if (age === null) { el.textContent = "\u2014"; return; }
+      el.textContent = String(age);
+      el.setAttribute("datetime", "P" + age + "Y");
     });
   })();
 
