@@ -1,12 +1,23 @@
+<div align="center">
+
+<img src="assets/branding/emh-logo-dark.svg#gh-dark-mode-only" alt="EMH" width="150">
+<img src="assets/branding/emh-logo-light.svg#gh-light-mode-only" alt="EMH" width="150">
+
 # Engineer Muhammad Hamza
 
-**Control Systems & Engineering System Design | UAV / UAS Engineering**
+**Control Systems &amp; Engineering System Design**
 
-[![Website](https://img.shields.io/badge/Website-Live-1d4670?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/)
-[![Specialization](https://img.shields.io/badge/Specialization-Control%20Systems-2b5f8e?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/#specialization)
-[![Domain](https://img.shields.io/badge/Domain-UAV%20%2F%20UAS-39424e?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/#uav)
+`UAV / UAS / DRONE ENGINEERING`
 
-> **Website:** <https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/>
+*Model. Design. Integrate. Control. Optimize.*
+
+[![Website](https://img.shields.io/badge/Website-Live-C2683A?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/)
+[![Specialization](https://img.shields.io/badge/Specialization-Control%20Systems-171614?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/#spec)
+[![Domain](https://img.shields.io/badge/Domain-UAV%20%2F%20UAS-6E6862?style=flat-square)](https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/#uav)
+
+**<https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/>**
+
+</div>
 
 ---
 
@@ -125,6 +136,23 @@ complete system.
 
 ---
 
+## Brand — EMH
+
+The monogram is one constructed figure, not a typeface: **E** and **M** stand on their own stems,
+and the **M**'s right leg is also the **H**'s left stem — the single ligature point. The chevron
+carries the signature copper.
+
+| | |
+|---|---|
+| Graphite | `#171614` — primary dark: hero, technical sections, footer |
+| Ivory | `#F5F1EA` — primary light: reading sections |
+| Copper | `#C2683A` — signature accent: signal, control, activity |
+
+Assets and usage rules: [`assets/branding/README.md`](assets/branding/README.md).
+
+
+---
+
 ## Website
 
 This repository **is** the website. It is a dependency-free static site published with GitHub Pages.
@@ -139,7 +167,8 @@ This repository **is** the website. It is a dependency-free static site publishe
 ├── robots.txt / sitemap.xml
 ├── .nojekyll                       # Serve files verbatim, no Jekyll processing
 ├── assets/
-│   ├── images/                     # og-cover.png, project figures
+│   ├── branding/                   # ★ EMH mark, logo variants, favicon, OG cover
+│   ├── images/                     # project figures
 │   ├── icons/
 │   └── documents/
 │       └── Muhammad_Hamza_CV.pdf   # ← drop the CV here
@@ -147,7 +176,7 @@ This repository **is** the website. It is a dependency-free static site publishe
 │   └── style.css                   # Complete design system, one file
 ├── js/
 │   ├── config.js                   # ★ ALL configuration lives here
-│   ├── main.js                     # Navigation, contact rendering, reveals
+│   ├── main.js                     # Motion system, navigation, brand bindings
 │   ├── github.js                   # Automatic project discovery + filtering
 │   └── projects.js                 # Project explorer and detail pages
 ├── data/
