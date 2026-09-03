@@ -58,6 +58,13 @@
   --accent:    var(--cu);
   --accent-tx: var(--cu-deep);
 
+  /* Technical figures — these tokens flip with the surface so diagram ink and
+     labels keep their contrast on both stone and graphite. */
+  --fig-ink:  #6E6862;
+  --fig-alt:  #7A736B;
+  --fig-node: #57524C;
+  --fig-lbl:  var(--st-500);
+
   /* Type */
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -86,6 +93,10 @@
   --rule-soft: rgba(245,241,234,.08);
   --accent:    var(--cu-lift);
   --accent-tx: var(--cu-lift);
+  --fig-ink:  #8F8880;
+  --fig-alt:  #A9A199;
+  --fig-node: #837C73;
+  --fig-lbl:  #8F8880;
   background: var(--bg);
   color: var(--tx);
 }
@@ -423,6 +434,12 @@ h3.sub {
    10 · Hero
    -------------------------------------------------------------------------- */
 .hero {
+  /* The hero paints its own graphite ground rather than carrying .dark, so it
+     has to opt into the dark figure palette explicitly. */
+  --fig-ink:  #8F8880;
+  --fig-alt:  #A9A199;
+  --fig-node: #837C73;
+  --fig-lbl:  #8F8880;
   position: relative; overflow: hidden;
   padding-block: clamp(8rem, 18vh, 12rem) clamp(3.5rem, 8vh, 6rem);
   min-height: 100svh;
@@ -518,7 +535,7 @@ h3.sub {
 
 .hero__stat dt {
   font-family: var(--mono); font-size: .6rem;
-  letter-spacing: .18em; text-transform: uppercase; color: #78716A;
+  letter-spacing: .18em; text-transform: uppercase; color: #8F8880;
   margin-bottom: .35rem;
 }
 .hero__stat dd { margin: 0; color: var(--iv-100); font-size: 1rem; font-weight: 500; }
@@ -538,16 +555,16 @@ h3.sub {
 }
 .figscroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
-.fig { width: 100%; height: auto; color: #6E6862; }
+.fig { width: 100%; height: auto; color: var(--fig-ink); }
 .fig .stroke { fill: none; stroke: currentColor; stroke-width: 1.1; vector-effect: non-scaling-stroke; }
-.fig .stroke-2 { fill: none; stroke: #A9A199; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.fig .stroke-2 { fill: none; stroke: var(--fig-alt); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 .fig .hot { stroke: var(--cu-lift); }
 .fig .lbl {
   font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
-  fill: #8A837A; text-transform: uppercase;
+  fill: var(--fig-lbl); text-transform: uppercase;
 }
 .fig .lbl-hot { fill: var(--cu-lift); }
-.fig .node { fill: none; stroke: #57524C; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.fig .node { fill: none; stroke: var(--fig-node); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .fig .dot { fill: var(--cu-lift); }
 
 /* Path draw animation */
@@ -858,9 +875,9 @@ a.prjlink:hover .prjlink__a { transform: translateX(4px); color: var(--accent-tx
 .ftr__mk { width: 76px; flex: none; color: var(--cu-lift); }
 .ftr__nm { color: var(--iv-100); font-weight: 600; font-size: 1rem; display: block; }
 .ftr__ds { font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: var(--cu-lift); margin-top: .35rem; display: block; }
-.ftr__dm { font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: #6E6862; margin-top: .2rem; display: block; }
+.ftr__dm { font-family: var(--mono); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: #8F8880; margin-top: .2rem; display: block; }
 .ftr__nav { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; font-family: var(--mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; }
-.ftr__bot { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; padding-top: 1.5rem; font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; color: #57524C; }
+.ftr__bot { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; padding-top: 1.5rem; font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; color: #8F8880; }
 
 /* --------------------------------------------------------------------------
    19 · Document pages (CV / project detail)
@@ -881,6 +898,17 @@ a.prjlink:hover .prjlink__a { transform: translateX(4px); color: var(--accent-tx
 .dl__k { font-weight: 600; font-size: .97rem; }
 .dl__v { color: var(--tx-2); font-size: .95rem; }
 @media (max-width: 700px) { .dl__r { grid-template-columns: 1fr; gap: .25rem; } }
+
+/* Capability list — Contribution (04). Editorial rules + columns, no cards. */
+.cap { display: grid; grid-template-columns: minmax(0, 1fr); }
+.cap__i { padding-block: 1.35rem; border-top: 1px solid var(--rule-soft); }
+.cap__i:last-child { border-bottom: 1px solid var(--rule-soft); }
+.cap__t { font-weight: 600; font-size: 1rem; letter-spacing: -.005em; margin-bottom: .38rem; }
+.cap__p { color: var(--tx-2); font-size: .95rem; max-width: 46ch; }
+@media (min-width: 1080px) {
+  .cap { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(1.5rem, 3vw, 2.75rem); }
+  .cap__i:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule-soft); }
+}
 
 .ent { padding-block: 1.15rem; border-top: 1px solid var(--rule-soft); }
 .ent:last-child { border-bottom: 1px solid var(--rule-soft); }
