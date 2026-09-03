@@ -1,7 +1,29 @@
 {
-  "generatedAt": null,
+  "generatedAt": "2026-09-03T04:36:07.279Z",
   "username": "MUHAMMAD-KHAN-lang",
-  "count": 0,
-  "repositories": [],
-  "_note": "Placeholder. The 'Update projects' GitHub Actions workflow overwrites this file with live repository metadata on its first run (Actions tab -> Update projects -> Run workflow). Until then the website queries the public GitHub API directly from the visitor's browser, so projects still appear."
+  "count": 1,
+  "repositories": [
+    {
+      "name": "Muhammad-Hamza-portfolio-8866",
+      "full_name": "MUHAMMAD-KHAN-lang/Muhammad-Hamza-portfolio-8866",
+      "description": "Engineer Muhammad Hamza — professional engineering portfolio. Control Systems & Engineering System Design, applied primarily to UAV/UAS engineering. Static GitHub Pages site with automatic project discovery.",
+      "html_url": "https://github.com/MUHAMMAD-KHAN-lang/Muhammad-Hamza-portfolio-8866",
+      "homepage": "",
+      "language": "HTML",
+      "topics": [],
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "open_issues_count": 0,
+      "size": 0,
+      "license": null,
+      "default_branch": "main",
+      "has_pages": false,
+      "archived": false,
+      "fork": false,
+      "private": false,
+      "created_at": "2026-09-03T03:35:44Z",
+      "updated_at": "2026-09-03T04:34:28Z",
+      "pushed_at": "2026-09-03T04:35:56Z"
+    }
+  ]
 }
