@@ -79,6 +79,10 @@
         return repos;
       });
 
+    /* Keep the snapshot's rejection handled from the start: if it settles before
+       `live` does, an unattached rejection is reported as an uncaught error. */
+    snap.catch(function () {});
+
     return live.catch(function () { return snap; });
   }
 
