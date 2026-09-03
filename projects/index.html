@@ -5,9 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Projects — Engineer Muhammad Hamza</title>
 <meta name="description" content="Engineering project portfolio of Muhammad Hamza: control systems, UAV/UAS, embedded systems, electronics, modeling and simulation. Listed automatically from public GitHub repositories.">
-<meta name="theme-color" content="#08111d">
+<meta name="theme-color" content="#171614">
 <link rel="canonical" href="https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/projects/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308111d'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='15' fill='%237fa8cc' text-anchor='middle'%3EMH%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Projects — Engineer Muhammad Hamza">
+<meta property="og:description" content="Engineering project portfolio of Muhammad Hamza: control systems, UAV/UAS, embedded systems, electronics, modeling and simulation. Listed automatically from public GitHub repositories.">
+<meta property="og:url" content="https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/projects/">
+<meta property="og:image" content="https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/assets/branding/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/branding/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
@@ -15,67 +21,84 @@
 </head>
 <body>
 <script>document.documentElement.classList.remove('no-js');</script>
-<a class="skip-link" href="#main">Skip to main content</a>
+<a class="skip" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"><span></span></div>
+<div id="cur" aria-hidden="true"></div><div id="curdot" aria-hidden="true"></div>
 
-<header class="site-header" id="siteHeader">
-  <div class="wrap">
-    <nav class="nav" aria-label="Primary">
-      <a class="brand" href="../index.html">
-        <span class="brand__mark" aria-hidden="true">MH</span>
-        <span class="brand__text">
-          <span class="brand__name">Engineer Muhammad Hamza</span>
-          <span class="brand__role">Control Systems &amp; System Design</span>
-        </span>
-      </a>
-      <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open navigation menu">
-        <span aria-hidden="true"></span>
-      </button>
-      <div class="nav__menu" id="navMenu">
-        <ul class="nav__list">
-          <li><a class="nav__link" href="../index.html">Home</a></li>
-          <li><a class="nav__link" href="../index.html#specialization">Specialization</a></li>
-          <li><a class="nav__link" href="../index.html#skills">Engineering Skills</a></li>
-          <li><a class="nav__link is-active" href="./">Projects</a></li>
-          <li><a class="nav__link" href="../profile.html">CV</a></li>
-          <li><a class="nav__link" href="../index.html#contact">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="brand" href="../index.html" aria-label="Engineer Muhammad Hamza — home">
+      <svg class="brand__mark" viewBox="0 0 674 434" fill="none" stroke="url(#emhg-index-1)" stroke-width="20.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M198.5 147L83.8 32.4A37.4 37.4 0 0 0 20 58.8L20 375.2A37.4 37.4 0 0 0 83.8 401.6L197.5 287"/><path d="M475.5 147L589.7 32.4A37.4 37.4 0 0 1 653.5 58.8L653.5 375.2A37.4 37.4 0 0 1 589.7 401.6L476.5 287"/><path d="M248 29H425"/><path d="M248 215H425"/><path d="M248 400H425"/><defs><linearGradient id="emhg-index-1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="434"><stop offset="0" stop-color="#EBA14D"/><stop offset="1" stop-color="#C66D27"/></linearGradient></defs></svg>
+      <span class="brand__txt">
+        <span class="brand__nm">Engineer Muhammad Hamza</span>
+        <span class="brand__ds">Control Systems &amp; System Design</span>
+      </span>
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="navwrap" aria-label="Open menu"><i aria-hidden="true"></i></button>
+    <div class="navwrap" id="navwrap">
+      <nav class="nav" aria-label="Primary">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#spec">Specialization</a>
+        <a href="../index.html#uav">UAV</a>
+        <a href="../index.html#approach">Approach</a>
+        <a href="../index.html#work">Work</a>
+        <a href="../profile.html">CV</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
   </div>
 </header>
 
 <main id="main">
-  <section class="section">
-    <div class="wrap wrap--narrow" id="projectApp">
-      <div class="state">
-        <div class="state__spinner" aria-hidden="true"></div>
-        <p role="status">Loading projects from GitHub…</p>
+
+<section class="band dark grain" style="padding-block:clamp(7.5rem,15vh,9.5rem) clamp(2.5rem,5vw,4rem)">
+  <div class="wrap">
+    <p class="marker rv-l"><span class="marker__no">07</span><span class="marker__rule rv-line"></span><span class="marker__label">Project index</span></p>
+    <div class="split--wide split">
+      <div><h1 class="title rv" id="pageTitle" style="font-size:clamp(2rem,5.5vw,3.4rem)">Engineering projects</h1></div>
+      <div>
+        <p class="lede rv" style="--d:80" id="pageLede">
+          Every public repository, read directly from GitHub. Select a project to open its detail page.
+        </p>
+        <div class="btns rv" style="--d:140;margin-top:1.5rem">
+          <a class="btn" href="../index.html#work">Back to portfolio <span class="ar" aria-hidden="true">→</span></a>
+          <a class="btn" href="https://github.com/MUHAMMAD-KHAN-lang" data-gh rel="noopener">GitHub profile</a>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<section class="band" style="padding-top:clamp(2.5rem,6vw,4rem)">
+  <div class="wrap" id="app">
+    <div class="state"><h3>Loading projects…</h3><p>Reading the public repositories from GitHub.</p></div>
+  </div>
+</section>
 </main>
 
-<footer class="site-footer">
+<footer class="ftr">
   <div class="wrap">
-    <div class="footer-top">
-      <div class="footer-identity">
-        <strong>Engineer Muhammad Hamza</strong>
-        <span>Control Systems &amp; Engineering System Design</span>
+    <div class="ftr__top">
+      <div class="ftr__id">
+        <svg class="ftr__mk" viewBox="0 0 674 434" fill="none" stroke="url(#emhg-index-2)" stroke-width="20.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M198.5 147L83.8 32.4A37.4 37.4 0 0 0 20 58.8L20 375.2A37.4 37.4 0 0 0 83.8 401.6L197.5 287"/><path d="M475.5 147L589.7 32.4A37.4 37.4 0 0 1 653.5 58.8L653.5 375.2A37.4 37.4 0 0 1 589.7 401.6L476.5 287"/><path d="M248 29H425"/><path d="M248 215H425"/><path d="M248 400H425"/><defs><linearGradient id="emhg-index-2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="434"><stop offset="0" stop-color="#EBA14D"/><stop offset="1" stop-color="#C66D27"/></linearGradient></defs></svg>
+        <div>
+          <strong class="ftr__nm">Engineer Muhammad Hamza</strong>
+          <span class="ftr__ds">Control Systems &amp; Engineering System Design</span>
+          <span class="ftr__dm">UAV / UAS / Drone Engineering</span>
+        </div>
       </div>
-      <nav aria-label="Footer">
-        <ul class="footer-nav">
-          <li><a href="../index.html">Home</a></li>
-          <li><a href="../profile.html">Engineering Profile</a></li>
-          <li><a href="../index.html#contact">Contact</a></li>
-        </ul>
+      <nav class="ftr__nav" aria-label="Footer">
+        <a href="../index.html">Home</a><a href="../index.html#work">Work</a>
+        <a href="../profile.html">Profile</a><a href="../projects/">All projects</a>
+        <a href="../index.html#contact">Contact</a>
       </nav>
     </div>
-    <div class="footer-bottom">
-      <p style="margin:0">&copy; <span id="year"></span> Muhammad Hamza. All rights reserved.</p>
+    <div class="ftr__bot">
+      <p>&copy; <span id="year"></span> Muhammad Hamza</p>
+      <p>EMH · Control Systems &amp; Engineering System Design</p>
     </div>
   </div>
 </footer>
-
 <script src="../js/config.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/projects.js"></script>
