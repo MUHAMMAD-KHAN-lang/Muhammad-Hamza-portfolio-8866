@@ -117,16 +117,20 @@ rather than producing a broken download.
 
 ---
 
-## 6. Adding the LinkedIn link
+## 6. Keeping the experience figures current
 
-In `js/config.js`:
+The two experience figures are never typed into the markup. They are computed at page load from two
+dates in `js/config.js`:
 
 ```js
-linkedinUrl: "https://www.linkedin.com/in/your-profile/",
+practicalExperienceStartDate: "2024-09-01",
+technicalDevelopmentStartDate: "2020-09-01",
 ```
 
-The contact section renders the LinkedIn card automatically once the value is non-empty. Until then it
-shows a neutral "not published yet" state rather than an invented link.
+`calculateCompletedYears()` in `js/main.js` counts only anniversaries that have actually passed, so
+the hero, the Experience section and the profile page all increment on their own. The dates above
+were chosen to reproduce the figures the site published before it became date-driven — replace them
+with the real ones and nothing else needs editing.
 
 ---
 
