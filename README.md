@@ -213,7 +213,6 @@ const SITE_CONFIG = {
   siteUrl:         "https://MUHAMMAD-KHAN-lang.github.io/Muhammad-Hamza-portfolio-8866/",
   email:           "MuhammadKhan90876@gmail.com",
   whatsapp:        "923020198866",
-  linkedinUrl:     "",                                        // ← add when available
   cvPath:          "assets/documents/Muhammad_Hamza_CV.pdf"
 };
 ```
@@ -240,7 +239,6 @@ and as a PDF at `assets/documents/Muhammad_Hamza_CV.pdf`.
 | **Email** | [MuhammadKhan90876@gmail.com](mailto:MuhammadKhan90876@gmail.com) |
 | **WhatsApp** | [Message on WhatsApp](https://wa.me/923020198866) |
 | **GitHub** | [@MUHAMMAD-KHAN-lang](https://github.com/MUHAMMAD-KHAN-lang) |
-| **LinkedIn** | *not published yet* |
 
 Open to engineering projects, technical collaboration, system development, and practical engineering
 work involving UAVs, control systems, embedded systems, electronics, modeling, simulation, and

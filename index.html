@@ -115,8 +115,8 @@
         <dl class="hero__stats rv" style="--d:560">
           <div class="hero__stat"><dt>Specialization</dt><dd>Control systems</dd></div>
           <div class="hero__stat"><dt>Domain</dt><dd>UAV / UAS</dd></div>
-          <div class="hero__stat"><dt>Practical experience</dt><dd><b>02</b> years</dd></div>
-          <div class="hero__stat"><dt>Technical development</dt><dd><b>~06</b> years</dd></div>
+          <div class="hero__stat"><dt>Practical experience</dt><dd><b data-yrs="practical">&#8212;</b> years</dd></div>
+          <div class="hero__stat"><dt>Technical development</dt><dd><b data-yrs="technical" data-approx>&#8212;</b> years</dd></div>
         </dl>
       </div>
 
@@ -199,7 +199,6 @@
 <div class="motto">
   <div class="wrap motto__in">
     <p class="motto__w">Model. <em>Design.</em> Integrate. <em>Control.</em> Optimize.</p>
-    <p class="motto__n">EMH — engineering as one complete system</p>
   </div>
 </div>
 
@@ -265,47 +264,63 @@
 
     <!-- Animated control loop -->
     <figure class="rv" style="--d:120;margin:clamp(2.5rem,6vw,4rem) 0 0">
-      <svg class="fig" viewBox="0 0 900 260" role="img" aria-labelledby="loopT loopD" style="color:#57524C">
+      <div class="figscroll" tabindex="0" role="group" aria-labelledby="loopT">
+      <svg class="fig fig--loop" viewBox="0 0 1000 340" role="img" aria-labelledby="loopT loopD" style="color:#57524C">
         <title id="loopT">Closed-loop control diagram</title>
         <desc id="loopD">Reference enters a summing junction, passes through the controller to the plant — the UAV dynamics — producing the output. The measured output returns through the sensor to the summing junction as negative feedback.</desc>
 
+        <!-- signal path and blocks: linework only, no type inside this group -->
         <g class="stroke-2">
-          <path class="draw" style="--d:0"   d="M40 96 H118"/>
-          <circle class="draw" style="--d:120" cx="140" cy="96" r="21"/>
-          <path class="draw" style="--d:220" d="M161 96 H236"/>
-          <rect class="draw" style="--d:320" x="236" y="66" width="164" height="60"/>
-          <path class="draw" style="--d:440" d="M400 96 H478"/>
-          <rect class="draw" style="--d:520" x="478" y="66" width="196" height="60"/>
-          <path class="draw" style="--d:640" d="M674 96 H860"/>
-          <path class="draw" style="--d:740" d="M780 96 V206 H556"/>
-          <rect class="draw" style="--d:860" x="392" y="180" width="164" height="52"/>
-          <path class="draw" style="--d:960" d="M392 206 H140 V117"/>
+          <path class="draw" style="--d:0"   d="M48 120 H208"/>
+          <circle class="draw" style="--d:120" cx="230" cy="120" r="22"/>
+          <path class="draw" style="--d:220" d="M252 120 H290"/>
+          <rect class="draw" style="--d:320" x="290" y="84" width="180" height="72"/>
+          <path class="draw" style="--d:440" d="M470 120 H560"/>
+          <rect class="draw" style="--d:520" x="560" y="84" width="220" height="72"/>
+          <path class="draw" style="--d:640" d="M780 120 H952"/>
+          <path class="draw" style="--d:740" d="M812 120 V250 H668"/>
+          <rect class="draw" style="--d:860" x="470" y="224" width="198" height="52"/>
+          <path class="draw" style="--d:960" d="M470 250 H230 V142"/>
         </g>
 
         <g class="fade" style="--d:1150">
-          <path class="stroke-2" d="M236 96 l-9 -4.5 v9 z" fill="currentColor"/>
-          <path class="stroke-2" d="M478 96 l-9 -4.5 v9 z" fill="currentColor"/>
-          <path class="stroke-2" d="M140 117 l-4.5 -9 h9 z" fill="currentColor"/>
-          <path class="stroke-2" d="M556 206 l9 -4.5 v9 z" fill="currentColor"/>
+          <path class="stroke-2" d="M290 120 l-9 -4.5 v9 z" fill="currentColor"/>
+          <path class="stroke-2" d="M560 120 l-9 -4.5 v9 z" fill="currentColor"/>
+          <path class="stroke-2" d="M230 142 l-4.5 9 h9 z" fill="currentColor"/>
+          <path class="stroke-2" d="M668 250 l9 -4.5 v9 z" fill="currentColor"/>
         </g>
 
+        <!-- terminal signal names: outside the linework, above the path -->
         <g class="fade" style="--d:1250">
-          <text class="lbl" x="40" y="86" font-size="11">r(t) · reference</text>
-          <text class="lbl" x="127" y="90" font-size="13">+</text>
-          <text class="lbl" x="145" y="115" font-size="13">−</text>
-          <text class="lbl lbl-hot" x="318" y="101" text-anchor="middle" font-size="11" style="letter-spacing:.18em">Controller</text>
-          <text class="lbl lbl-hot" x="576" y="94" text-anchor="middle" font-size="11" style="letter-spacing:.18em">Plant</text>
-          <text class="lbl" x="576" y="112" text-anchor="middle" font-size="9">UAV dynamics</text>
-          <text class="lbl" x="474" y="212" text-anchor="middle" font-size="11" style="letter-spacing:.18em">Sensor</text>
-          <text class="lbl" x="790" y="86" font-size="11">y(t) · output</text>
-          <text class="lbl" x="248" y="252" font-size="9">Error e(t) = r(t) − ŷ(t)</text>
-          <text class="lbl" x="700" y="196" font-size="9">Measured state</text>
+          <text class="lbl" x="48" y="104" font-size="11">r(t) &#183; reference</text>
+          <text class="lbl" x="952" y="104" font-size="11" text-anchor="end">y(t) &#183; output</text>
+        </g>
+
+        <!-- summing-junction signs, inside the junction as convention wants -->
+        <g class="fade" style="--d:1280">
+          <text class="lbl" x="200" y="106" font-size="12" text-anchor="middle">+</text>
+          <text class="lbl" x="206" y="160" font-size="12" text-anchor="middle">&#8722;</text>
+        </g>
+
+        <!-- block titles: centred in their blocks, clear of every border -->
+        <g class="fade" style="--d:1320">
+          <text class="lbl lbl-hot" x="380" y="126" text-anchor="middle" font-size="12" style="letter-spacing:.16em">Controller</text>
+          <text class="lbl lbl-hot" x="670" y="114" text-anchor="middle" font-size="12" style="letter-spacing:.16em">Plant</text>
+          <text class="lbl" x="670" y="136" text-anchor="middle" font-size="10">UAV dynamics</text>
+          <text class="lbl" x="569" y="256" text-anchor="middle" font-size="12" style="letter-spacing:.16em">Sensor</text>
+        </g>
+
+        <!-- feedback annotations: their own band between blocks and path -->
+        <g class="fade fig__note" style="--d:1380">
+          <text class="lbl" x="740" y="236" text-anchor="middle" font-size="10">Measured state</text>
+          <text class="lbl" x="290" y="312" font-size="10">Error e(t) = r(t) &#8722; &#375;(t)</text>
         </g>
 
         <!-- travelling signal -->
-        <circle class="dot pulse" r="4.5" style="offset-path:path('M40 96 H118 M161 96 H236 H400 H478 H674 H780 V206 H140 V117');"></circle>
+        <circle class="dot pulse" r="4.5" style="offset-path:path('M48 120 H208 M252 120 H812 V250 H230 V142');"></circle>
       </svg>
-      <figcaption class="tick rv" style="--d:200;margin-top:1rem">Fig. 02 — closed-loop structure underlying the flight-control work</figcaption>
+      </div>
+      <figcaption class="tick rv" style="--d:200;margin-top:1rem">Fig. 02 &#8212; closed-loop structure underlying the flight-control work</figcaption>
     </figure>
   </div>
 </section>
@@ -337,66 +352,75 @@
       </div>
 
       <div class="rv" style="--d:100">
-        <svg class="fig" viewBox="0 0 420 460" role="img" aria-labelledby="uavT uavD" style="color:#8C857C">
+        <div class="figscroll" tabindex="0" role="group" aria-labelledby="uavT">
+        <svg class="fig fig--uav" viewBox="0 0 500 530" role="img" aria-labelledby="uavT uavD" style="color:#8C857C">
           <title id="uavT">UAV subsystem map</title>
-          <desc id="uavD">A stacked diagram of the UAV subsystems: airframe and structure, actuation, sensing, embedded computation, communication and power, with the control law spanning them.</desc>
+          <desc id="uavD">A stacked diagram of the UAV subsystems: airframe and structure, actuation, sensing and estimation, embedded computation, communication and antennas, and power and energy, with the control law spanning all six.</desc>
 
           <g class="stroke" opacity=".55">
             <path class="draw" style="--d:0" d="M20 20 h24 M20 20 v24"/>
-            <path class="draw" style="--d:40" d="M400 440 h-24 M400 440 v-24"/>
+            <path class="draw" style="--d:40" d="M480 510 h-24 M480 510 v-24"/>
           </g>
 
           <!-- vertical spine -->
-          <path class="stroke hot draw" style="--d:120" d="M56 74 V400"/>
+          <path class="stroke hot draw" style="--d:120" d="M64 86 V448"/>
 
-          <!-- six subsystem bars -->
+          <!-- six subsystem rules; all type sits ABOVE its rule, never on it -->
           <g class="stroke-2">
-            <path class="draw" style="--d:200" d="M56 90 H356"/>
-            <path class="draw" style="--d:280" d="M56 152 H320"/>
-            <path class="draw" style="--d:360" d="M56 214 H344"/>
-            <path class="draw" style="--d:440" d="M56 276 H300"/>
-            <path class="draw" style="--d:520" d="M56 338 H332"/>
-            <path class="draw" style="--d:600" d="M56 400 H288"/>
+            <path class="draw" style="--d:200" d="M64 108 H400"/>
+            <path class="draw" style="--d:280" d="M64 176 H300"/>
+            <path class="draw" style="--d:360" d="M64 244 H380"/>
+            <path class="draw" style="--d:440" d="M64 312 H372"/>
+            <path class="draw" style="--d:520" d="M64 380 H404"/>
+            <path class="draw" style="--d:600" d="M64 448 H344"/>
           </g>
           <g class="fade" style="--d:900">
-            <circle class="dot" cx="56" cy="90" r="4"/><circle class="dot" cx="56" cy="152" r="4"/>
-            <circle class="dot" cx="56" cy="214" r="4"/><circle class="dot" cx="56" cy="276" r="4"/>
-            <circle class="dot" cx="56" cy="338" r="4"/><circle class="dot" cx="56" cy="400" r="4"/>
-          </g>
-          <g class="fade" style="--d:1000">
-            <text class="lbl" x="70" y="82" font-size="11" style="letter-spacing:.2em">Airframe &amp; structure</text>
-            <text class="lbl" x="70" y="144" font-size="11" style="letter-spacing:.2em">Actuation</text>
-            <text class="lbl" x="70" y="206" font-size="11" style="letter-spacing:.2em">Sensing &amp; estimation</text>
-            <text class="lbl" x="70" y="268" font-size="11" style="letter-spacing:.2em">Embedded computation</text>
-            <text class="lbl" x="70" y="330" font-size="11" style="letter-spacing:.2em">Communication &amp; antennas</text>
-            <text class="lbl" x="70" y="392" font-size="11" style="letter-spacing:.2em">Power &amp; energy</text>
-          </g>
-          <g class="fade" style="--d:1150">
-            <text class="lbl" x="366" y="94" font-size="8.5" text-anchor="end">CAD · mass · inertia</text>
-            <text class="lbl" x="330" y="156" font-size="8.5" text-anchor="end">ESC · motors</text>
-            <text class="lbl" x="354" y="218" font-size="8.5" text-anchor="end">IMU · filtering</text>
-            <text class="lbl" x="310" y="280" font-size="8.5" text-anchor="end">real-time loop</text>
-            <text class="lbl" x="342" y="342" font-size="8.5" text-anchor="end">telemetry · RF</text>
-            <text class="lbl" x="298" y="404" font-size="8.5" text-anchor="end">budget · endurance</text>
+            <circle class="dot" cx="64" cy="108" r="4"/>
+            <circle class="dot" cx="64" cy="176" r="4"/>
+            <circle class="dot" cx="64" cy="244" r="4"/>
+            <circle class="dot" cx="64" cy="312" r="4"/>
+            <circle class="dot" cx="64" cy="380" r="4"/>
+            <circle class="dot" cx="64" cy="448" r="4"/>
           </g>
 
-          <!-- control law spanning bracket -->
-          <path class="stroke hot draw" style="--d:700" d="M386 90 H396 V400 H386"/>
+          <!-- primary subsystem names -->
+          <g class="fade" style="--d:1000">
+            <text class="lbl" x="78" y="95" font-size="11" style="letter-spacing:.2em">Airframe &amp; structure</text>
+            <text class="lbl" x="78" y="163" font-size="11" style="letter-spacing:.2em">Actuation</text>
+            <text class="lbl" x="78" y="231" font-size="11" style="letter-spacing:.2em">Sensing &amp; estimation</text>
+            <text class="lbl" x="78" y="299" font-size="11" style="letter-spacing:.2em">Embedded computation</text>
+            <text class="lbl" x="78" y="367" font-size="11" style="letter-spacing:.2em">Communication &amp; antennas</text>
+            <text class="lbl" x="78" y="435" font-size="11" style="letter-spacing:.2em">Power &amp; energy</text>
+          </g>
+
+          <!-- secondary annotations, right-aligned to the end of each rule -->
+          <g class="fade fig__note" style="--d:1150">
+            <text class="lbl" x="400" y="95" font-size="8.5" text-anchor="end">CAD &#183; mass &#183; inertia</text>
+            <text class="lbl" x="300" y="163" font-size="8.5" text-anchor="end">ESC &#183; motors</text>
+            <text class="lbl" x="380" y="231" font-size="8.5" text-anchor="end">IMU &#183; filtering</text>
+            <text class="lbl" x="372" y="299" font-size="8.5" text-anchor="end">real-time loop</text>
+            <text class="lbl" x="404" y="367" font-size="8.5" text-anchor="end">telemetry &#183; RF</text>
+            <text class="lbl" x="344" y="435" font-size="8.5" text-anchor="end">budget &#183; endurance</text>
+          </g>
+
+          <!-- control law spanning bracket, set well clear of the rules -->
+          <path class="stroke hot draw" style="--d:700" d="M420 108 H432 V448 H420"/>
           <g class="fade" style="--d:1300">
-            <text class="lbl lbl-hot" x="404" y="252" font-size="10" transform="rotate(90 404 252)" text-anchor="middle" style="letter-spacing:.22em">Control law</text>
+            <text class="lbl lbl-hot" x="456" y="278" font-size="10" transform="rotate(90 456 278)" text-anchor="middle" style="letter-spacing:.22em">Control law</text>
           </g>
 
           <g class="fade" style="--d:1400">
-            <text class="lbl" x="20" y="440" font-size="8.5">Fig. 03 — subsystem coupling</text>
+            <text class="lbl" x="20" y="506" font-size="8.5">Fig. 03 &#8212; subsystem coupling</text>
           </g>
         </svg>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===== 04 · Engineering foundation ===== -->
-<section class="band" id="foundation" style="background:var(--iv-200)">
+<section class="band" id="foundation" style="background:var(--sn-200)">
   <div class="wrap">
     <p class="marker rv-l"><span class="marker__no">04</span><span class="marker__rule rv-line"></span><span class="marker__label">Engineering foundation</span></p>
 
@@ -404,8 +428,9 @@
       <div><h2 class="title rv">Supporting competencies</h2></div>
       <div>
         <p class="lede rv" style="--d:80">
-          Not a list of separate skills. Each one supplies part of the mathematical, computational,
-          electronic, communication or physical-design foundation the core specialization depends on.
+          Not a second list of engineering fields. These are the broad capabilities the core
+          specialization runs on — how a problem is reasoned about, represented, computed, built
+          and held together as one system.
         </p>
       </div>
     </div>
@@ -428,51 +453,51 @@
 
       <div class="chain" id="chain">
         <div class="chain__row rv" style="--d:0">
-          <div class="chain__k">A · 01</div>
+          <div class="chain__k">A &#183; 01</div>
           <div>
             <h3 class="chain__t">Mathematics &amp; analytical methods</h3>
-            <p class="chain__d">The working tool of control theory, dynamics, modeling and optimization — used to formulate, solve and interpret UAV models, not studied for its own sake.</p>
-            <ul class="chain__tags"><li>Calculus</li><li>Differential equations</li><li>Linear algebra</li><li>Analytical mathematics</li><li>Quantitative analysis</li></ul>
+            <p class="chain__d">Mathematical reasoning, analytical method and quantitative modelling — the foundation used to state an engineering problem precisely enough to solve it, and to judge whether the answer means anything.</p>
+            <ul class="chain__tags"><li>Analytical method</li><li>Quantitative modelling</li><li>Mathematical reasoning</li></ul>
           </div>
         </div>
         <div class="chain__row rv" style="--d:60">
-          <div class="chain__k">A · 02</div>
+          <div class="chain__k">A &#183; 02</div>
           <div>
-            <h3 class="chain__t">Programming &amp; computational engineering</h3>
-            <p class="chain__d">An engineering instrument for modelling, computing, simulating, automating and implementing — rather than a separate software-development identity.</p>
-            <ul class="chain__tags"><li>Python</li><li>C</li><li>C++</li><li>Numerical computation</li><li>Algorithms</li><li>Embedded programming</li></ul>
+            <h3 class="chain__t">Problem solving &amp; technical reasoning</h3>
+            <p class="chain__d">Structured problem solving: decomposing a problem into parts that can be reasoned about, tracing behaviour back to cause, and choosing between candidate solutions on technical grounds rather than preference.</p>
+            <ul class="chain__tags"><li>Problem decomposition</li><li>Root-cause reasoning</li><li>Engineering judgement</li></ul>
           </div>
         </div>
         <div class="chain__row rv" style="--d:120">
-          <div class="chain__k">A · 03</div>
+          <div class="chain__k">A &#183; 03</div>
           <div>
-            <h3 class="chain__t">Electronics &amp; embedded systems</h3>
-            <p class="chain__d">The layer where a control law stops being an equation and becomes a real-time process with finite resources.</p>
-            <ul class="chain__tags"><li>Digital electronics</li><li>Microcontrollers</li><li>Sensors</li><li>Actuators</li><li>Hardware integration</li></ul>
+            <h3 class="chain__t">Modelling &amp; simulation</h3>
+            <p class="chain__d">Representing physical and engineering systems mathematically and computationally in order to analyse how they behave, predict what they will do under conditions that have not been built yet, and improve them before committing hardware.</p>
+            <ul class="chain__tags"><li>System representation</li><li>Behaviour prediction</li><li>Computational experiment</li></ul>
           </div>
         </div>
         <div class="chain__row rv" style="--d:180">
-          <div class="chain__k">A · 04</div>
+          <div class="chain__k">A &#183; 04</div>
           <div>
-            <h3 class="chain__t">Antennas &amp; wireless communication</h3>
-            <p class="chain__d">A subsystem with its own physics and its own failure modes — decisive for telemetry, navigation support and airborne links.</p>
-            <ul class="chain__tags"><li>Antenna concepts</li><li>Wireless communication</li><li>RF concepts</li><li>UAV communication systems</li></ul>
+            <h3 class="chain__t">Computational methods &amp; programming</h3>
+            <p class="chain__d">Computational thinking applied to engineering: algorithmic implementation, numerical method, automation of repetitive analysis, and software as an instrument for engineering work rather than as a separate identity.</p>
+            <ul class="chain__tags"><li>Computational thinking</li><li>Numerical method</li><li>Automation</li></ul>
           </div>
         </div>
         <div class="chain__row rv" style="--d:240">
-          <div class="chain__k">A · 05</div>
+          <div class="chain__k">A &#183; 05</div>
           <div>
-            <h3 class="chain__t">CAD &amp; 3D engineering design</h3>
-            <p class="chain__d">The link between analytical concept and physical implementation. The emphasis is design-for-integration, not any single CAD package.</p>
-            <ul class="chain__tags"><li>3D modeling</li><li>Structural / component design</li><li>Assemblies</li><li>Design for integration</li></ul>
+            <h3 class="chain__t">Design &amp; prototyping</h3>
+            <p class="chain__d">Moving an engineering concept toward something that exists: practical design, prototyping, hardware and software brought together, and the iteration and evaluation that decide whether the thing actually works.</p>
+            <ul class="chain__tags"><li>Concept to implementation</li><li>Iterative development</li><li>Design evaluation</li></ul>
           </div>
         </div>
         <div class="chain__row rv" style="--d:300">
-          <div class="chain__k">A · 06</div>
+          <div class="chain__k">A &#183; 06</div>
           <div>
-            <h3 class="chain__t">Systems engineering</h3>
-            <p class="chain__d">The discipline that keeps the other five coherent: requirements, interfaces, integration and verification treated as engineering artefacts.</p>
-            <ul class="chain__tags"><li>System architecture</li><li>Interfaces</li><li>Trade-offs</li><li>Verification</li><li>Validation</li></ul>
+            <h3 class="chain__t">Systems thinking &amp; integration</h3>
+            <p class="chain__d">Reading components, interfaces and dependencies as parts of one complete system — where the trade-offs sit, how subsystems load each other, and why system-level behaviour is rarely the sum of the parts.</p>
+            <ul class="chain__tags"><li>Interfaces &amp; dependencies</li><li>Trade-offs</li><li>System-level behaviour</li></ul>
           </div>
         </div>
       </div>
@@ -514,12 +539,12 @@
 
     <div class="nums" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))">
       <div class="num rv">
-        <p class="num__v">02<small>yrs</small></p>
+        <p class="num__v"><span data-yrs="practical">&#8212;</span><small>yrs</small></p>
         <p class="num__k">Practical engineering experience</p>
         <p class="num__d">Project-based engineering work: developing projects, solving engineering problems, designing systems and delivering technical solutions to different individuals.</p>
       </div>
       <div class="num rv" style="--d:100">
-        <p class="num__v">~06<small>yrs</small></p>
+        <p class="num__v"><span data-yrs="technical" data-approx>&#8212;</span><small>yrs</small></p>
         <p class="num__k">Self-directed technical development</p>
         <p class="num__d">Independent study, experimentation and technical development across control, mathematics, electronics, embedded systems, communications, CAD and systems engineering.</p>
       </div>
@@ -538,7 +563,7 @@
 </section>
 
 <!-- ===== 07 · Selected work ===== -->
-<section class="band" id="work" style="background:var(--iv-050)">
+<section class="band" id="work" style="background:var(--sn-050)">
   <div class="wrap">
     <p class="marker rv-l"><span class="marker__no">07</span><span class="marker__rule rv-line"></span><span class="marker__label">Selected work</span></p>
 
