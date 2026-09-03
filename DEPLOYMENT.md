@@ -123,14 +123,14 @@ The two experience figures are never typed into the markup. They are computed at
 dates in `js/config.js`:
 
 ```js
-practicalExperienceStartDate: "2024-09-01",
-technicalDevelopmentStartDate: "2020-09-01",
+practicalExperienceStartDate: "2024",
+technicalDevelopmentStartDate: "2020",
 ```
 
 `calculateCompletedYears()` in `js/main.js` counts only anniversaries that have actually passed, so
-the hero, the Experience section and the profile page all increment on their own. The dates above
-were chosen to reproduce the figures the site published before it became date-driven — replace them
-with the real ones and nothing else needs editing.
+the hero, the Experience section and the profile page all increment on their own. A bare year is
+read as 1 January of that year; write a full `"YYYY-MM-DD"` instead if a figure should turn over on
+an exact anniversary rather than with the calendar.
 
 ---
 
