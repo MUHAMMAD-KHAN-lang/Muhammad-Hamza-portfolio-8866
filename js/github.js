@@ -368,6 +368,7 @@
         "</div>" +
       "</div>";
     if (statusEl) statusEl.textContent = "No projects available.";
+    state.rendered = true;
   }
 
   function renderError(reason) {
