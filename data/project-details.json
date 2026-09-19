@@ -61,7 +61,7 @@
       "summary": "Designed and implemented a Python-based MAVLink 2 fuzzing framework for ArduCopter Software-In-The-Loop (SITL), adapting the fuzzing methodology described in a published 2016 MAVLink security study to a modern MAVLink 2 environment. The project includes reproducible test generation, TCP-based protocol fuzzing, automated SITL monitoring, human-readable test logging, and seven structured fuzzing cases.",
       "byline": "Muhammad Hamza",
       "context": "ICES — Intranet Communications in Emergency Situations",
-      "thumbnail": "../assets/images/mavlink2-sitl-fuzzing.svg",
+      "thumbnail": "../assets/images/mavlink2-sitl-fuzzing-v2.svg",
       "topicsDisplay": "MAVLink 2 · ArduPilot · ArduCopter · SITL · cybersecurity · drone security · fuzzing · protocol fuzzing · Python · UAV security · security research",
       "tech": [
         "Python",

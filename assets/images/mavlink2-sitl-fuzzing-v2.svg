@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-labelledby="ttl">
+<title id="ttl">MAVLink 2 security testing — ArduCopter SITL fuzzing</title>
+<defs>
+  <style>
+    .m{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .s{font-family:Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  </style>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1D1B19"/><stop offset="1" stop-color="#121110"/>
+  </linearGradient>
+  <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+    <path d="M34 0H0V34" fill="none" stroke="#F5F1EA" stroke-opacity=".055" stroke-width="1"/>
+  </pattern>
+  <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#E0894F" stop-opacity=".85"/>
+    <stop offset="1" stop-color="#E0894F" stop-opacity=".1"/>
+  </linearGradient>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="#E0894F"/>
+  </marker>
+</defs>
+
+<rect width="1600" height="1000" fill="url(#bg)"/>
+<rect width="1600" height="1000" fill="url(#grid)"/>
+
+<g stroke="#E0894F" stroke-width="3" fill="none" opacity=".9">
+  <path d="M48 84V48h36"/><path d="M1516 48h36v36"/><path d="M48 916v36h36"/><path d="M1552 916v36h-36"/>
+</g>
+
+<!-- EMH mark, top-right corner, subtle -->
+<g transform="translate(1416,84) scale(0.13)" opacity=".55">
+  <g fill="none" stroke="#F5F1EA" stroke-width="20.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M198.5 147L83.8 32.4A37.4 37.4 0 0 0 20 58.8L20 375.2A37.4 37.4 0 0 0 83.8 401.6L197.5 287"/>
+    <path d="M475.5 147L589.7 32.4A37.4 37.4 0 0 1 653.5 58.8L653.5 375.2A37.4 37.4 0 0 1 589.7 401.6L476.5 287"/>
+    <path d="M248 29H425"/><path d="M248 215H425"/><path d="M248 400H425"/>
+  </g>
+</g>
+
+<!-- packet strip -->
+<g class="m" font-size="20" letter-spacing="3.2" fill="#8A837A">
+  <text x="96" y="124" fill="#E0894F">FD</text>
+  <text x="136" y="124">09 00 00 4E 01 00 00 00 00 00 00 00 00 00 8D 7A</text>
+  <text x="96" y="158" opacity=".5">FD FF 00 00 4E 01 00 · FD 00 00 00 21 01 00 · FD 01</text>
+</g>
+<line x1="96" y1="184" x2="1504" y2="184" stroke="url(#fade)" stroke-width="1.5"/>
+
+<!-- title block -->
+<text class="m" x="96" y="252" font-size="21" letter-spacing="7" fill="#E0894F">PROTOCOL FUZZING · SITL</text>
+<text class="s" x="94" y="362" font-size="104" font-weight="700" letter-spacing="-2" fill="#F5F1EA">MAVLink 2</text>
+<text class="s" x="96" y="432" font-size="44" font-weight="600" letter-spacing="7.5" fill="#B9B2A8">SECURITY TESTING</text>
+<text class="m" x="98" y="486" font-size="26" letter-spacing="3.8" fill="#8A837A">ArduCopter SITL</text>
+
+<!-- flow chain: 4 boxes h=50, gap 34, y 545 → 847 -->
+<g class="m" font-size="19" letter-spacing="2.4">
+  <rect x="96" y="545" width="320" height="50" fill="none" stroke="#F5F1EA" stroke-opacity=".22"/>
+  <text x="118" y="577" fill="#F5F1EA">PYTHON FUZZER</text>
+  <line x1="256" y1="595" x2="256" y2="626" stroke="#E0894F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="274" y="619" fill="#E0894F" font-size="16">TCP 5760</text>
+
+  <rect x="96" y="629" width="320" height="50" fill="none" stroke="#E0894F" stroke-opacity=".75"/>
+  <text x="118" y="661" fill="#E0894F">MAVLINK 2 · FD</text>
+  <line x1="256" y1="679" x2="256" y2="710" stroke="#E0894F" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <rect x="96" y="713" width="320" height="50" fill="none" stroke="#F5F1EA" stroke-opacity=".22"/>
+  <text x="118" y="745" fill="#F5F1EA">ARDUCOPTER SITL</text>
+  <line x1="256" y1="763" x2="256" y2="794" stroke="#E0894F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="274" y="787" fill="#E0894F" font-size="16">TCP 9001</text>
+
+  <rect x="96" y="797" width="320" height="50" fill="none" stroke="#F5F1EA" stroke-opacity=".22"/>
+  <text x="118" y="829" fill="#F5F1EA">SITL MONITOR</text>
+</g>
+
+<!-- quadrotor schematic -->
+<g transform="translate(1140,565) scale(0.8)" fill="none" stroke="#F5F1EA" stroke-opacity=".45" stroke-width="4" stroke-linecap="round">
+  <path d="M-150-118 L-52-20 M150-118 L52-20 M-150 118 L-52 20 M150 118 L52 20"/>
+  <g stroke="#E0894F" stroke-opacity=".85">
+    <circle cx="-150" cy="-118" r="52"/><circle cx="150" cy="-118" r="52"/>
+    <circle cx="-150" cy="118" r="52"/><circle cx="150" cy="118" r="52"/>
+  </g>
+  <rect x="-54" y="-32" width="108" height="64" rx="10" stroke="#F5F1EA" stroke-opacity=".7"/>
+  <path d="M0-32 V-86" stroke="#E0894F"/>
+  <g stroke="#E0894F" stroke-opacity=".75" stroke-width="3.5">
+    <path d="M-30-106 A42 42 0 0 1 30-106"/>
+    <path d="M-54-128 A74 74 0 0 1 54-128"/>
+  </g>
+</g>
+<text class="m" x="1140" y="760" font-size="17" letter-spacing="3.2" fill="#8A837A" text-anchor="middle">UAV / UAS SECURITY</text>
+<text class="m" x="1140" y="820" font-size="17" letter-spacing="3.2" fill="#8A837A" text-anchor="middle">7 STRUCTURED FUZZ CASES</text>
+
+<line x1="96" y1="880" x2="1504" y2="880" stroke="#F5F1EA" stroke-opacity=".14" stroke-width="1.5"/>
+<text class="m" x="96" y="926" font-size="18" letter-spacing="3" fill="#8A837A">PYTHON · pymavlink · TCP/IP · AUTOMATED MONITORING</text>
+<text class="m" x="1504" y="926" font-size="16" letter-spacing="2.8" fill="#8A837A" text-anchor="end">BY MUHAMMAD HAMZA</text>
+</svg>
