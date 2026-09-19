@@ -9,7 +9,9 @@
       "model": "Mathematical model, governing equations, assumptions.",
       "implementation": "How it was built: hardware, software, tooling.",
       "results": "Measured or observed outcomes. State only what was actually observed.",
-      "images": ["Relative paths, e.g. ../assets/images/example-diagram.png"],
+      "images": [
+        "Relative paths, e.g. ../assets/images/example-diagram.png"
+      ],
       "documentation": "URL to further documentation, if any."
     },
     "example": {
@@ -26,5 +28,16 @@
       }
     }
   },
-  "projects": {}
+  "projects": {
+    "ices-mavlink2-arducopter-sitl-fuzzing": {
+      "problem": "UAV autopilots accept MAVLink traffic over a network link. If the parser mishandles malformed, truncated or length-inconsistent frames, the communication endpoint becomes a failure point for the whole airborne node. Robustness of that endpoint had not been characterised for the MAVLink 2 ArduCopter SITL build in use.",
+      "objective": "Build a reproducible protocol-level fuzzing framework for ArduCopter Software-In-The-Loop and characterise how it behaves under random, boundary-value and structurally malformed MAVLink 2 input, with every run logged as evidence.",
+      "approach": "Adapt the seven-case fuzzing methodology published by Domin, Symeonidis and Marin (2016) from MAVLink 1 to MAVLink 2. The original work targeted MAVLink 1 frames (magic byte FE); this is an independent reimplementation for the MAVLink 2 wire format (FD), its 3-byte message ID and its one-byte payload-length field, with CRC-extra values taken from the installed pymavlink message map.",
+      "architecture": "A Windows fuzzing host drives the ArduCopter SITL MAVLink/TCP endpoint on port 5760. A separate monitor service on the SITL host reports, over TCP port 9001, whether the arducopter process is alive and whether 5760 is still listening — so a fault is detected independently of the fuzzer's own socket.",
+      "implementation": "Python and pymavlink on the fuzzing host; ArduCopter SITL built from the ArduPilot source tree on Ubuntu. Seven case scripts generate the test conditions, a baseline connection script verifies the MAVLink path before each campaign, and every case writes timestamped logs. The scripts as executed are published alongside the logs they produced.",
+      "results": "Cases 1, 3, 4, 5, 6 and 7 completed with no SITL crash detected: 100 random-byte tests, 256 zero-payload frames, 255 all-00 payloads, 255 all-FF payloads, 255 random payloads and 509 length-mismatch tests. Case 2 (65,280 message-ID / payload-length combinations) requires the corrected full rerun and is recorded as outstanding. \"No crash detected\" means the monitor observed no process termination and no loss of the listening socket at the time of each check — it is not a finding that the parser is free of defects, and no vulnerability is claimed.",
+      "images": [],
+      "documentation": "https://github.com/MUHAMMAD-KHAN-lang/ices-mavlink2-arducopter-sitl-fuzzing"
+    }
+  }
 }
