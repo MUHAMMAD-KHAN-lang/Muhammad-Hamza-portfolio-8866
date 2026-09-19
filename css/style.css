@@ -988,3 +988,9 @@ html.no-js .navwrap { display: block; }
 html.no-js .chain__row .chain__k, html.no-js .ladder__s .ladder__n { color: var(--accent-tx); }
 html.no-js .ladder__s::before { transform: scale(1); opacity: 1; }
 html.no-js .flowmap__v { transform: scaleY(1); }
+
+/* Project thumbnail — used when data/project-details.json supplies one.
+   Same frame and proportions as the generated monogram plate. */
+.plate--img { display: block; }
+.plate--img::before { content: none; }
+.plate--img img { width: 100%; height: 100%; object-fit: cover; }

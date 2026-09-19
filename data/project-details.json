@@ -12,7 +12,26 @@
       "images": [
         "Relative paths, e.g. ../assets/images/example-diagram.png"
       ],
-      "documentation": "URL to further documentation, if any."
+      "documentation": "URL to further documentation, if any.",
+      "title": "Human-readable project title shown instead of the repository name.",
+      "summary": "Portfolio description shown as the page lede, instead of the GitHub repository description.",
+      "byline": "Author attribution shown in the metadata list.",
+      "context": "Research or programme context. Context only — never an authorship or ownership claim.",
+      "thumbnail": "Relative path to a project thumbnail, e.g. ../assets/images/example.svg. Replaces the generated monogram plate. 16:10.",
+      "tech": [
+        "Technologies actually used. Do not list anything the project does not use."
+      ],
+      "testCases": [
+        {
+          "name": "Case n",
+          "condition": "What the case sends.",
+          "result": "Recorded outcome, stated only as observed."
+        }
+      ],
+      "testNote": "Caveat printed under the test-case table.",
+      "reference": "Prior work this project builds on, attributed to its own authors.",
+      "referenceUrl": "Public bibliographic record for that prior work. Never a redistributed copy.",
+      "topicsDisplay": "Curated topic line, used instead of the raw repository topics."
     },
     "example": {
       "my-repository-name": {
@@ -34,10 +53,68 @@
       "objective": "Build a reproducible protocol-level fuzzing framework for ArduCopter Software-In-The-Loop and characterise how it behaves under random, boundary-value and structurally malformed MAVLink 2 input, with every run logged as evidence.",
       "approach": "Adapt the seven-case fuzzing methodology published by Domin, Symeonidis and Marin (2016) from MAVLink 1 to MAVLink 2. The original work targeted MAVLink 1 frames (magic byte FE); this is an independent reimplementation for the MAVLink 2 wire format (FD), its 3-byte message ID and its one-byte payload-length field, with CRC-extra values taken from the installed pymavlink message map.",
       "architecture": "A Windows fuzzing host drives the ArduCopter SITL MAVLink/TCP endpoint on port 5760. A separate monitor service on the SITL host reports, over TCP port 9001, whether the arducopter process is alive and whether 5760 is still listening — so a fault is detected independently of the fuzzer's own socket.",
-      "implementation": "Python and pymavlink on the fuzzing host; ArduCopter SITL built from the ArduPilot source tree on Ubuntu. Seven case scripts generate the test conditions, a baseline connection script verifies the MAVLink path before each campaign, and every case writes timestamped logs. The scripts as executed are published alongside the logs they produced.",
-      "results": "Cases 1, 3, 4, 5, 6 and 7 completed with no SITL crash detected: 100 random-byte tests, 256 zero-payload frames, 255 all-00 payloads, 255 all-FF payloads, 255 random payloads and 509 length-mismatch tests. Case 2 (65,280 message-ID / payload-length combinations) requires the corrected full rerun and is recorded as outstanding. \"No crash detected\" means the monitor observed no process termination and no loss of the listening socket at the time of each check — it is not a finding that the parser is free of defects, and no vulnerability is claimed.",
+      "implementation": "Built a controlled security-testing environment using ArduPilot/ArduCopter SITL on Ubuntu and a Python-based fuzzing client on Windows. The system communicates with ArduCopter over TCP port 5760, while a separate Ubuntu SITL monitor tracks the ArduCopter process and the listening state of the SITL port. Original study: MAVLink 1 methodology. This implementation: MAVLink 2 adaptation — the packet layer was rewritten for the MAVLink 2 frame format (FD), its 3-byte message ID and its one-byte payload-length field, with CRC-extra values taken from the installed pymavlink message map.",
+      "results": "Cases 1, 3, 4, 5, 6 and 7 completed with no crash detected. Case 2 did not complete its full 65,280-test matrix and its corrected rerun is outstanding. No vulnerability was discovered, and no claim of correctness or security is made on the basis of these runs.",
       "images": [],
-      "documentation": "https://github.com/MUHAMMAD-KHAN-lang/ices-mavlink2-arducopter-sitl-fuzzing"
+      "documentation": "https://github.com/MUHAMMAD-KHAN-lang/ices-mavlink2-arducopter-sitl-fuzzing#readme",
+      "title": "MAVLink 2 Security Testing — ArduCopter SITL Fuzzing",
+      "summary": "Designed and implemented a Python-based MAVLink 2 fuzzing framework for ArduCopter Software-In-The-Loop (SITL), adapting the fuzzing methodology described in a published 2016 MAVLink security study to a modern MAVLink 2 environment. The project includes reproducible test generation, TCP-based protocol fuzzing, automated SITL monitoring, human-readable test logging, and seven structured fuzzing cases.",
+      "byline": "Muhammad Hamza",
+      "context": "ICES — Intranet Communications in Emergency Situations",
+      "thumbnail": "../assets/images/mavlink2-sitl-fuzzing.svg",
+      "topicsDisplay": "MAVLink 2 · ArduPilot · ArduCopter · SITL · cybersecurity · drone security · fuzzing · protocol fuzzing · Python · UAV security · security research",
+      "tech": [
+        "Python",
+        "MAVLink 2",
+        "ArduPilot",
+        "ArduCopter SITL",
+        "TCP/IP",
+        "Protocol Fuzzing",
+        "Cybersecurity",
+        "Security Testing",
+        "Automated Monitoring",
+        "Reproducible Testing"
+      ],
+      "testCases": [
+        {
+          "name": "Case 1",
+          "condition": "Completely random data.",
+          "result": "100 tests completed, no crash detected"
+        },
+        {
+          "name": "Case 2",
+          "condition": "Message IDs with randomized payload lengths.",
+          "result": "earlier run encountered TCP backpressure and did not complete the full 65,280-test matrix; corrected rerun outstanding"
+        },
+        {
+          "name": "Case 3",
+          "condition": "Zero-byte payload frames.",
+          "result": "256/256, no crash detected"
+        },
+        {
+          "name": "Case 4",
+          "condition": "All-00 payloads with increasing payload length.",
+          "result": "255/255, no crash detected"
+        },
+        {
+          "name": "Case 5",
+          "condition": "All-FF payloads with increasing payload length.",
+          "result": "255/255, no crash detected"
+        },
+        {
+          "name": "Case 6",
+          "condition": "Random payloads with increasing payload length.",
+          "result": "255/255, no crash detected"
+        },
+        {
+          "name": "Case 7",
+          "condition": "Declared payload length mismatched by -1 and +1 against the actual payload.",
+          "result": "509/509, no crash detected"
+        }
+      ],
+      "testNote": "No crash detected during the completed test campaigns. That means the monitor observed no ArduCopter process termination and no loss of the listening socket at the time of each check — it is not a finding that the parser is free of defects, and no vulnerability is claimed.",
+      "reference": "This project adapts the fuzzing methodology described by Domin, Symeonidis, and Marin (2016) from a MAVLink 1 environment to a modern MAVLink 2 / ArduCopter SITL environment. Karel Domin, Iraklis Symeonidis and Eduard Marin, “Security Analysis of the Drone Communication Protocol: Fuzzing the MAVLink Protocol”, 2016. The paper is the methodological reference and the work of its own authors; this repository is an independent implementation and is not their work.",
+      "referenceUrl": "https://orbilu.uni.lu/handle/10993/37613"
     }
   }
 }

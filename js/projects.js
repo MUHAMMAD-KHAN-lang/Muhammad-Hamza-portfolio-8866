@@ -93,7 +93,12 @@
       .catch(function () { return {}; });
   }
 
-  function plate(p) {
+  function plate(p, d) {
+    if (d && d.thumbnail) {
+      return '<div class="plate plate--img">' +
+        '<img src="' + esc(d.thumbnail) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" loading="lazy">' +
+        '</div>';
+    }
     return '<div class="plate">' +
       '<span class="plate__c"></span><span class="plate__c"></span>' +
       '<span class="plate__c"></span><span class="plate__c"></span>' +
@@ -105,10 +110,12 @@
   /* ------------------------------------------------------------- detail */
   function detail(repo, d) {
     var p = shape(repo);
-    document.title = p.name + " — Engineer Muhammad Hamza";
+    var heading = d.title || p.name;
+    var lede = d.summary || p.desc || "No repository description provided.";
+    document.title = heading + " — Engineer Muhammad Hamza";
     var t = document.getElementById("pageTitle"), l = document.getElementById("pageLede");
-    if (t) t.textContent = p.name;
-    if (l) l.textContent = p.desc || "No repository description provided.";
+    if (t) t.textContent = heading;
+    if (l) l.textContent = lede;
 
     var sections = [
       ["Problem", d.problem], ["Objective", d.objective],
@@ -130,6 +137,32 @@
         '<p>The repository itself, including its README and source, is the authoritative record in the ' +
         'meantime.</p></div></div>';
 
+    var tech = (d.tech || []).length
+      ? '<div class="blk rv"><h2 class="blk__t"><span>Technologies</span><span>TEC</span></h2>' +
+        '<ul class="chain__tags" style="margin-top:0">' +
+        d.tech.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></div>'
+      : "";
+
+    var cases = (d.testCases || []).length
+      ? '<div class="blk rv"><h2 class="blk__t"><span>Test cases</span><span>TST</span></h2>' +
+        '<dl class="dl">' + d.testCases.map(function (c) {
+          return '<div class="dl__r"><dt class="dl__k">' + esc(c.name) + '</dt>' +
+                 '<dd class="dl__v">' + esc(c.condition) +
+                 (c.result ? ' <span style="color:var(--tx-3)">— ' + esc(c.result) + '</span>' : '') +
+                 '</dd></div>';
+        }).join("") + '</dl>' +
+        (d.testNote ? '<p class="body" style="margin-top:1rem">' + esc(d.testNote) + '</p>' : '') +
+        '</div>'
+      : "";
+
+    var reference = d.reference
+      ? '<div class="blk rv"><h2 class="blk__t"><span>Reference</span><span>REF</span></h2>' +
+        '<p class="body">' + esc(d.reference) + '</p>' +
+        (d.referenceUrl ? '<p style="margin-top:.75rem"><a class="alink" href="' + esc(d.referenceUrl) +
+          '" target="_blank" rel="noopener noreferrer">Original paper record <span class="ar" aria-hidden="true">\u2192</span></a></p>' : '') +
+        '</div>'
+      : "";
+
     var images = (d.images || []).length
       ? '<div class="blk rv"><h2 class="blk__t"><span>Diagrams &amp; images</span><span>FIG</span></h2>' +
         '<div class="split" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))">' +
@@ -143,12 +176,15 @@
         '<dl class="feat__meta">' +
           '<div><dt>Domain</dt><dd>' + esc(p.domain) + '</dd></div>' +
           '<div><dt>Language</dt><dd>' + esc(p.lang || "Not specified") + '</dd></div>' +
-          '<div><dt>Topics</dt><dd>' + esc(p.topics.join(" · ") || "None") + '</dd></div>' +
+          '<div><dt>Topics</dt><dd>' + esc(d.topicsDisplay || p.topics.join(" · ") || "None") + '</dd></div>' +
+          '<div><dt>Repository</dt><dd>' + esc(p.name) + '</dd></div>' +
+          (d.byline ? '<div><dt>Author</dt><dd>' + esc(d.byline) + '</dd></div>' : '') +
+          (d.context ? '<div><dt>Research context</dt><dd>' + esc(d.context) + '</dd></div>' : '') +
           '<div><dt>Branch</dt><dd>' + esc(p.branch) + '</dd></div>' +
           '<div><dt>Created</dt><dd>' + esc(fdate(p.created)) + '</dd></div>' +
           '<div><dt>Updated</dt><dd>' + esc(fdate(p.upd)) + '</dd></div>' +
         '</dl>' +
-        '<div>' + plate(p) +
+        '<div>' + plate(p, d) +
           '<div class="btns" style="margin-top:1.25rem">' +
             '<a class="btn btn--fill" href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">Open repository <span class="ar" aria-hidden="true">→</span></a>' +
             (p.home ? '<a class="btn btn--line" href="' + esc(p.home) + '" target="_blank" rel="noopener noreferrer">Live site</a>' : '') +
@@ -156,13 +192,14 @@
             '<a class="btn btn--line" href="./">All projects</a>' +
           '</div>' +
         '</div>' +
-      '</div>' + written + images;
+      '</div>' + written + cases + tech + reference + images;
 
     show();
   }
 
   /* -------------------------------------------------------------- index */
-  function index(repos) {
+  function index(repos, details) {
+    details = details || {};
     var items = repos
       .filter(function (r) {
         var n = String(r.name || "").toLowerCase();
@@ -184,10 +221,11 @@
     }
 
     app.innerHTML = '<div class="rows rv" style="border-top:0">' + items.map(function (p, i) {
+      var dd = details[p.name] || {};
       return '<a class="prjlink" href="?repo=' + encodeURIComponent(p.name) + '">' +
         '<span class="prjlink__no">' + ("0" + (i + 1)).slice(-2) + '</span>' +
-        '<span class="prjlink__n">' + esc(p.name) + (p.featured ? ' <span style="color:var(--accent-tx);font-family:var(--mono);font-size:.6rem;letter-spacing:.14em">FEATURED</span>' : '') + '</span>' +
-        '<span class="prjlink__d">' + esc(p.desc || "No description provided") + '</span>' +
+        '<span class="prjlink__n">' + esc(dd.title || p.name) + (p.featured ? ' <span style="color:var(--accent-tx);font-family:var(--mono);font-size:.6rem;letter-spacing:.14em">FEATURED</span>' : '') + '</span>' +
+        '<span class="prjlink__d">' + esc(dd.summary || p.desc || "No description provided") + '</span>' +
         '<span class="prjlink__m">' + esc(p.domain) + '</span>' +
         '<span class="prjlink__a" aria-hidden="true">→</span></a>';
     }).join("") + '</div>';
@@ -208,7 +246,7 @@
   Promise.all([loadRepos(), loadDetails()])
     .then(function (res) {
       var repos = res[0] || [], details = res[1] || {};
-      if (!repoArg) { index(repos); return; }
+      if (!repoArg) { index(repos, details); return; }
 
       var hit = repos.filter(function (r) {
         return String(r.name).toLowerCase() === repoArg.toLowerCase();
