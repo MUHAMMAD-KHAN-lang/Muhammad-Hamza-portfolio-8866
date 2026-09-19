@@ -32,7 +32,21 @@
 
   var PROFILE = E.gh();
 
-  var S = { list: [], src: null, at: null, filter: "all", showAll: !!PCFG.showUnclassified, done: false };
+  var S = { list: [], src: null, at: null, filter: "all", showAll: !!PCFG.showUnclassified, done: false, det: {} };
+
+  /* Hand-written presentation for selected repositories — the same
+     data/project-details.json the project pages read, so a project looks
+     identical here and on its own page. Paths inside it are written relative
+     to projects/, so they are re-based for this page. */
+  function details() {
+    if (!window.fetch) return Promise.resolve({});
+    return fetch("data/project-details.json", { cache: "no-cache" })
+      .then(function (r) { return r.ok ? r.json() : { projects: {} }; })
+      .then(function (p) { return (p && p.projects) || {}; })
+      .catch(function () { return {}; });
+  }
+  function asset(src) { return String(src || "").replace(/^(\.\.\/)+/, ""); }
+  function det(name) { return S.det[name] || {}; }
 
   /* ----------------------------------------------------- classification */
   function low(a) { return (a || []).map(function (t) { return String(t).toLowerCase(); }); }
@@ -162,6 +176,12 @@
 
   /* ------------------------------------------------------------ markup */
   function plate(p) {
+    var d = det(p.name);
+    if (d.thumbnail) {
+      return '<div class="plate plate--img">' +
+        '<img src="' + esc(asset(d.thumbnail)) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" loading="lazy">' +
+      '</div>';
+    }
     return '<div class="plate">' +
       '<span class="plate__c"></span><span class="plate__c"></span>' +
       '<span class="plate__c"></span><span class="plate__c"></span>' +
@@ -173,17 +193,20 @@
 
   function featured(p, i) {
     var n = ("0" + (i + 1)).slice(-2);
+    var d = det(p.name);
     return '<article class="feat rv">' +
       '<div>' +
         '<p class="feat__no">Featured &nbsp;' + n + '&nbsp; — &nbsp;' + esc(p.domain) + '</p>' +
-        '<h3 class="feat__t"><a href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">' + esc(p.name) + '</a></h3>' +
-        (p.desc
-          ? '<p class="feat__d">' + esc(p.desc) + '</p>'
+        '<h3 class="feat__t"><a href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">' + esc(d.title || p.name) + '</a></h3>' +
+        ((d.summary || p.desc)
+          ? '<p class="feat__d">' + esc(d.summary || p.desc) + '</p>'
           : '<p class="feat__d" style="color:var(--tx-3)">No repository description provided — the repository itself is the record.</p>') +
         '<dl class="feat__meta">' +
           '<div><dt>Domain</dt><dd>' + esc(p.domain) + '</dd></div>' +
           '<div><dt>Language</dt><dd>' + esc(p.lang || "Not specified") + '</dd></div>' +
-          (p.topics.length ? '<div><dt>Topics</dt><dd>' + esc(p.topics.join(" · ")) + '</dd></div>' : '') +
+          ((d.topicsDisplay || p.topics.length) ? '<div><dt>Topics</dt><dd>' + esc(d.topicsDisplay || p.topics.join(" · ")) + '</dd></div>' : '') +
+          (d.byline ? '<div><dt>Author</dt><dd>' + esc(d.byline) + '</dd></div>' : '') +
+          (d.context ? '<div><dt>Research context</dt><dd>' + esc(d.context) + '</dd></div>' : '') +
           '<div><dt>Updated</dt><dd>' + esc(E.date(p.upd)) + '</dd></div>' +
         '</dl>' +
         '<div class="btns" style="margin-top:1.5rem">' +
@@ -198,10 +221,11 @@
 
   function row(p, i) {
     var n = ("0" + (i + 1)).slice(-2);
+    var d = det(p.name);
     return '<a class="prjlink" href="projects/?repo=' + encodeURIComponent(p.name) + '">' +
       '<span class="prjlink__no">' + n + '</span>' +
-      '<span class="prjlink__n">' + esc(p.name) + '</span>' +
-      '<span class="prjlink__d">' + esc(p.desc || "No description provided") + '</span>' +
+      '<span class="prjlink__n">' + esc(d.title || p.name) + '</span>' +
+      '<span class="prjlink__d">' + esc(d.summary || p.desc || "No description provided") + '</span>' +
       '<span class="prjlink__m">' + esc(p.domain) + '</span>' +
       '<span class="prjlink__a" aria-hidden="true">→</span>' +
     '</a>';
@@ -345,12 +369,14 @@
   /* ---------------------------------------------------------------- boot */
   var liveErr = null;
 
-  var livePromise = live()
-    .then(function (repos) { paintAll(repos, "live", null); return true; })
+  var detPromise = details().then(function (d) { S.det = d || {}; });
+
+  var livePromise = Promise.all([live(), detPromise])
+    .then(function (r) { paintAll(r[0], "live", null); return true; })
     .catch(function (err) { liveErr = (err && err.message) || "unavailable"; return false; });
 
-  snapshot()
-    .then(function (p) { if (S.src !== "live") paintAll(p.repos, "snapshot", p.at); })
+  Promise.all([snapshot(), detPromise])
+    .then(function (r) { if (S.src !== "live") paintAll(r[0].repos, "snapshot", r[0].at); })
     .catch(function () {
       livePromise.then(function (ok) { if (!ok && !S.done) failed(liveErr); });
     });
