@@ -179,7 +179,7 @@
     var d = det(p.name);
     if (d.thumbnail) {
       return '<div class="plate plate--img">' +
-        '<img src="' + esc(asset(d.thumbnail)) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" loading="lazy">' +
+        '<img src="' + esc(asset(d.thumbnail)) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" decoding="async">' +
       '</div>';
     }
     return '<div class="plate">' +

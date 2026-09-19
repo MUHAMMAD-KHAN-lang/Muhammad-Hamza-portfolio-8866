@@ -96,7 +96,7 @@
   function plate(p, d) {
     if (d && d.thumbnail) {
       return '<div class="plate plate--img">' +
-        '<img src="' + esc(d.thumbnail) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" loading="lazy">' +
+        '<img src="' + esc(d.thumbnail) + '" alt="' + esc((d.title || p.name) + " — project thumbnail") + '" decoding="async">' +
         '</div>';
     }
     return '<div class="plate">' +
